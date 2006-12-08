@@ -5,17 +5,17 @@ require 'rake/rdoctask'
 desc 'Default: run unit tests.'
 task :default => :test
 
-desc 'Test the firestarter plugin.'
+desc 'Run unit tests.'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
 
-desc 'Generate documentation for the firestarter plugin.'
+desc 'Generate documentation.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Firestarter'
+  rdoc.title    = 'Tinder'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
