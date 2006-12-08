@@ -14,7 +14,7 @@ class Campfire
     end
     
     def toggle_guest_access
-      post "room/#{self.id}/toggle_guest_access"
+      verify_response(post("room/#{self.id}/toggle_guest_access"), :success)
     end
     
     def guest_url
@@ -26,34 +26,42 @@ class Campfire
     end
     
     def rename(name)
-      post "account/edit/room/#{self.id}", { :room => { :name => name }}, :ajax => true
+      name if verify_response(post("account/edit/room/#{self.id}", { :room => { :name => name }}, :ajax => true), :success)
     end
     
     def change_topic(topic)
-      post "room/#{self.id}/change_topic", { 'room' => { 'topic' => topic }}, :ajax => true
+      topic if verify_response(post("room/#{self.id}/change_topic", { 'room' => { 'topic' => topic }}, :ajax => true), :success)
     end
     
     def lock
-      post "room/#{self.id}/lock", {}, :ajax => true
+      verify_response(post("room/#{self.id}/lock", {}, :ajax => true), :success)
     end
     
     def unlock
-      post "room/#{self.id}/unlock", {}, :ajax => true
+      verify_response(post("room/#{self.id}/unlock", {}, :ajax => true), :success)
     end
     
     def destroy
-      post "account/delete/room/#{self.id}"
+      verify_response(post("account/delete/room/#{self.id}"), :success)
     end
     
     def speak(message, options = {})
-      options = { :paste => false }.merge(options)
-      post "room/#{self.id}/speak", { :message => message, :paste => options[:paste].inspect }, :ajax => true
+      options = { :paste => '' }.merge(options)
+      message if verify_response(post("room/#{self.id}/speak", { :message => message, :paste => options[:paste] }, :ajax => true), :success)
     end
     
   private
   
-    def post(path = nil, data = {}, options = {})
-      @campfire.send :post, path, data, options
+    def post(*args)
+      @campfire.send :post, *args
+    end
+    
+    def get(*args)
+      @campfire.send :get, *args
+    end
+    
+    def verify_response(*args)
+      @campfire.send :verify_response, *args
     end
     
   end
@@ -75,24 +83,12 @@ class Campfire
     link = Hpricot(get.body).search("//h2/a").detect { |a| a.inner_html == name }
     link.blank? ? nil : Room.new(self, link.attributes['href'].scan(/room\/(\d*)$/).to_s)
   end
-
   
 private
-
-  def flatten(params)
-    params = params.dup
-    params.stringify_keys!.each do |k,v| 
-      if v.is_a? Hash
-        params.delete(k)
-        v.each {|subk,v| params["#{k}[#{subk}]"] = v }
-      end
-    end
-  end
 
   def url_for(path = "")
     "http://#{host}/#{path}"
   end
-  
 
   def post(path, data = {}, options = {})
     @request = returning Net::HTTP::Post.new(url_for(path)) do |request|
@@ -122,6 +118,17 @@ private
     end
   end
   
+  # flatten a nested hash
+  def flatten(params)
+    params = params.dup
+    params.stringify_keys!.each do |k,v| 
+      if v.is_a? Hash
+        params.delete(k)
+        v.each {|subk,v| params["#{k}[#{subk}]"] = v }
+      end
+    end
+  end
+
   def verify_response(response, options = {})
     if options.is_a? Symbol
       response.code == case options

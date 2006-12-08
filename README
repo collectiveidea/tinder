@@ -9,3 +9,4 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
   room.speak 'Hello world!'
   room.speak "my pasted\ncode", :paste => true
   room.destroy
+

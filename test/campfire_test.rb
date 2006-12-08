@@ -17,6 +17,7 @@ class CampfireTest < Test::Unit::TestCase
     
     assert room.is_a?(Campfire::Room), "expected a Campfire::Room but was a #{room.class}"
     assert_not_nil room.id
+    assert_equal "new name", room.rename("new name")
     
     room.destroy
     assert_nil @campfire.find_room_by_name('Testing123')
