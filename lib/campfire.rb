@@ -75,6 +75,10 @@ class Campfire
     @logged_in = verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for)
   end
   
+  def logout
+    @logged_in = !verify_response(get("logout"), :redirect)
+  end
+  
   def create_room(name, topic = nil)
     find_room_by_name(name) if verify_response(post("account/create/room?from=lobby", {:room => {:name => name, :topic => topic}}, :ajax => true), :success)
   end
