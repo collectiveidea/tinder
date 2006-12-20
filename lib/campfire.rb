@@ -22,7 +22,7 @@ class Campfire
     end
     
     def guest_invite_code
-      guest_url.scan(/^#{@campfire.url}\/(\w*)$/).to_s
+      guest_url.scan(/^http:\/\/#{@campfire.host}\/(\w*)$/).to_s
     end
     
     def rename(name)
@@ -73,6 +73,10 @@ class Campfire
   
   def login(email, password)
     @logged_in = verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for)
+  end
+  
+  def logged_in?
+    @logged_in
   end
   
   def logout
