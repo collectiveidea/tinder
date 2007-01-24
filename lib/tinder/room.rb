@@ -24,7 +24,7 @@ module Tinder
       name if verify_response(post("account/edit/room/#{self.id}", { :room => { :name => name }}, :ajax => true), :success)
     end
 
-    def change_topic(topic)
+    def topic=(topic)
       topic if verify_response(post("room/#{self.id}/change_topic", { 'room' => { 'topic' => topic }}, :ajax => true), :success)
     end
 

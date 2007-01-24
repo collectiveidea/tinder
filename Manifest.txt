@@ -1,12 +1,11 @@
 CHANGELOG.txt
 Manifest.txt
-README
+README.txt
 Rakefile
-TODO.txt
 init.rb
 lib/tinder.rb
 lib/tinder/campfire.rb
 lib/tinder/room.rb
+lib/tinder/version.rb
 test/remote/remote_campfire_test.rb
 test/test_helper.rb
-uninstall.rb

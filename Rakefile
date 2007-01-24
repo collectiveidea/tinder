@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'hoe'
-#require File.join(File.dirname(__FILE__), 'lib', 'tinder', 'version')
+require File.join(File.dirname(__FILE__), 'lib', 'tinder', 'version')
 
 # RDOC_OPTS = ['--quiet', '--title', "Tinder",
 #     "--opname", "index.html",
@@ -9,8 +9,8 @@ require 'hoe'
 #     "--inline-source"]
 # 
 # Generate all the Rake tasks
-#CalDAV::VERSION::STRING
-hoe = Hoe.new('tinder', ENV['VERSION'] || '0.1') do |p|
+
+hoe = Hoe.new('tinder', ENV['VERSION'] || Tinder::VERSION::STRING) do |p|
   p.rubyforge_name = 'tinder'
   p.summary = "An (unofficial) Campfire API"
   p.description = "An API for interfacing with Campfire, the 37Signals chat application."

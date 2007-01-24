@@ -12,10 +12,13 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
 
 == Requirements
 
+* Active Support
+  gem install activesupport
 * Hpricot
   gem install hpricot
 
 == ToDo
 
-* Tests!
+* Tests! (unit and remote)
 * Log in via guest url
+* SSL

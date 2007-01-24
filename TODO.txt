@@ -1,4 +1,0 @@
-
-* Tests! (unit and remote)
-* SSL
-* Guest login for a room
