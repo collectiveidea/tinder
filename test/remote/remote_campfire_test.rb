@@ -1,13 +1,9 @@
-#require File.dirname(__FILE__) + '/test_helper'
-require 'test/unit'
-require 'rubygems'
-require 'active_support'
-require File.dirname(__FILE__) + '/../lib/campfire.rb'
+require File.dirname(__FILE__) + '/../test_helper'
 
-class CampfireTest < Test::Unit::TestCase
+class RemoteCampfireTest < Test::Unit::TestCase
   
   def setup
-    @campfire = Campfire.new 'opensoul'
+    @campfire = Tinder::Campfire.new 'opensoul'
     @user, @pass = 'brandon@opensoul.org', 'testing'
   end
   
@@ -15,7 +11,7 @@ class CampfireTest < Test::Unit::TestCase
     assert login
     room = @campfire.create_room('Testing123')
     
-    assert room.is_a?(Campfire::Room), "expected a Campfire::Room but was a #{room.class}"
+    assert Tinder::Room, room
     assert_not_nil room.id
     assert_equal "new name", room.rename("new name")
     
@@ -34,8 +30,8 @@ class CampfireTest < Test::Unit::TestCase
 
 private
 
-  def login
-    @campfire.login('brandon@opensoul.org', 'testing')
+  def login(user = @user, pass = @pass)
+    @campfire.login(user, pass)
   end
   
 end

@@ -1,2 +1,1 @@
-
-require 'campfire'
+require 'tinder'

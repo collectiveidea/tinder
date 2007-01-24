@@ -1,22 +1,24 @@
-require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rubygems'
+require 'hoe'
+#require File.join(File.dirname(__FILE__), 'lib', 'tinder', 'version')
 
-desc 'Default: run unit tests.'
-task :default => :test
-
-desc 'Run unit tests.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
-
-desc 'Generate documentation.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Tinder'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+# RDOC_OPTS = ['--quiet', '--title', "Tinder",
+#     "--opname", "index.html",
+#     "--line-numbers", 
+#     "--main", "README",
+#     "--inline-source"]
+# 
+# Generate all the Rake tasks
+#CalDAV::VERSION::STRING
+hoe = Hoe.new('tinder', ENV['VERSION'] || '0.1') do |p|
+  p.rubyforge_name = 'tinder'
+  p.summary = "An (unofficial) Campfire API"
+  p.description = "An API for interfacing with Campfire, the 37Signals chat application."
+  p.author = 'Brandon Keepers'
+  p.email = 'brandon@opensoul.org'
+  p.url = 'http://tinder.rubyforge.org'
+  p.test_globs = ["test/**/*_test.rb"]
+  p.changes = p.paragraphs_of('CHANGELOG.txt', 0..1).join("\n\n")
+  p.extra_deps << ['activesupport']
+  p.extra_deps << ['hpricot']
 end
