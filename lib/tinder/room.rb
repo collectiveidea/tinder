@@ -89,9 +89,9 @@ module Tinder
           sleep 5
         else
           continue = false
-          messages
         end
       end
+      messages
     end
     
 
