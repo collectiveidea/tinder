@@ -92,12 +92,14 @@ module Tinder
     end
 
     def verify_response(response, options = {})
-      if options.is_a? Symbol
-        response.code == case options
-        when :success then "200"
-        end
+      if options.is_a?(Symbol)
+        case options
+        when :success then [200]
+        when :redirect then 300..399
+        else raise ArgumentError.new("Unknown response #{options}")
+        end.include?(response.code.to_i)
       elsif options[:redirect_to]
-        response.code == "302" && response['location'] == options[:redirect_to]
+        verify_response(response, :redirect) && response['location'] == options[:redirect_to]
       else
         false
       end
