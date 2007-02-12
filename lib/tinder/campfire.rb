@@ -8,14 +8,15 @@ module Tinder
   #   room.speak 'Hello world!'
   #   room.destroy
   class Campfire
-    attr_accessor :subdomain, :host
+    attr_reader :subdomain, :uri
 
-    def initialize(subdomain)
+    def initialize(subdomain, options = {})
+      options = { :ssl => false }.merge(options)
       @cookie = nil
-      self.subdomain = subdomain
-      self.host = "#{subdomain}.campfirenow.com"
+      @subdomain = subdomain
+      @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.campfirenow.com")
     end
-  
+    
     def login(email, password)
       @logged_in = verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for)
     end
@@ -25,7 +26,9 @@ module Tinder
     end
   
     def logout
-      @logged_in = !verify_response(get("logout"), :redirect)
+      returning verify_response(get("logout"), :redirect) do |result|
+        @logged_in = !result
+      end
     end
   
     def create_room(name, topic = nil)
@@ -46,37 +49,51 @@ module Tinder
       users.flatten.compact.uniq.sort
     end
 
+    # Deprecated: only included for backwards compatability
+    def host
+      uri.host
+    end
+    
+    def ssl?
+      uri.scheme == 'https'
+    end
+  
   private
 
     def url_for(path = "")
-      "http://#{host}/#{path}"
+      "#{uri}/#{path}"
     end
 
     def post(path, data = {}, options = {})
-      @request = returning Net::HTTP::Post.new(url_for(path)) do |request|
-        prepare_request(request, options)
-        request.add_field 'Content-Type', 'application/x-www-form-urlencoded'
-        request.set_form_data flatten(data)
-      end
-      returning @response = Net::HTTP.new(host, 80).start { |http| http.request(@request) } do |response|
-        @cookie = response['set-cookie'] if response['set-cookie']
+      perform_request(options) do
+        returning Net::HTTP::Post.new(url_for(path)) do |request|
+          request.add_field 'Content-Type', 'application/x-www-form-urlencoded'
+          request.set_form_data flatten(data)
+        end
       end
     end
   
     def get(path = nil, options = {})
-      @request = returning Net::HTTP::Get.new(url_for(path)) do |request|
-        prepare_request(request, options)
-      end
-      returning @response = Net::HTTP.new(host, 80).start { |http| http.request(@request) } do |response|
-        @cookie = response['set-cookie'] if response['set-cookie']
-      end
+      perform_request(options) { Net::HTTP::Get.new(url_for(path)) }
     end
   
     def prepare_request(request, options = {})
-      request.add_field 'Cookie', @cookie if @cookie
-      if options[:ajax]
-        request.add_field 'X-Requested-With', 'XMLHttpRequest'
-        request.add_field 'X-Prototype-Version', '1.5.0_rc1'
+      returning request do
+        request.add_field 'Cookie', @cookie if @cookie
+        if options[:ajax]
+          request.add_field 'X-Requested-With', 'XMLHttpRequest'
+          request.add_field 'X-Prototype-Version', '1.5.0_rc1'
+        end
+      end
+    end
+    
+    def perform_request(options = {}, &block)
+      @request = prepare_request(yield, options)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = ssl?
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ssl?
+      @response = returning http.request(@request) do |response|
+        @cookie = response['set-cookie'] if response['set-cookie']
       end
     end
   
@@ -93,11 +110,12 @@ module Tinder
 
     def verify_response(response, options = {})
       if options.is_a?(Symbol)
-        case options
+        codes = case options
         when :success then [200]
         when :redirect then 300..399
         else raise ArgumentError.new("Unknown response #{options}")
-        end.include?(response.code.to_i)
+        end
+        codes.include?(response.code.to_i)
       elsif options[:redirect_to]
         verify_response(response, :redirect) && response['location'] == options[:redirect_to]
       else

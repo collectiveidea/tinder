@@ -1,7 +1,9 @@
 
 require 'rubygems'
 require 'active_support'
+require 'uri'
 require 'net/http'
+require 'net/https'
 require 'open-uri'
 require 'hpricot'
 

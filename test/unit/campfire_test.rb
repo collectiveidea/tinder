@@ -39,5 +39,23 @@ class CampfireTest < Test::Unit::TestCase
     assert false === @campfire.send(:verify_response, @response, :redirect_to => '/foobar')
   end
   
+  def test_prepare_request_returns_request
+    request = Net::HTTP::Get.new("does_not_matter")
+    assert_equal request, @campfire.send(:prepare_request, request)
+  end
   
+  def test_prepare_request_sets_cookie
+    request = Net::HTTP::Get.new("does_not_matter")
+    @campfire.instance_variable_set("@cookie", "foobar")
+    assert_equal "foobar", @campfire.send(:prepare_request, request)['Cookie']
+  end
+  
+  def test_perform_request
+    response = mock("response")
+    Net::HTTP.any_instance.stubs(:request).returns(response)
+    request = Net::HTTP::Get.new("does_not_matter")
+    response.expects(:[]).with('set-cookie')
+    
+    assert_equal response, @campfire.send(:perform_request) { request }
+  end
 end
