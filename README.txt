@@ -1,4 +1,4 @@
-= Tinder
+= Tinder - get the Campfire started
 
 Tinder is a library for interfacing with Campfire, the chat application from 37Signals.
 
@@ -7,7 +7,7 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
   room = campfire.create_room 'New Room', 'My new campfire room to test tinder'
   room.rename 'New Room Name'
   room.speak 'Hello world!'
-  room.speak "my pasted\ncode", :paste => true
+  room.paste "my pasted\ncode"
   room.destroy
 
 == Requirements
@@ -19,6 +19,6 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
 
 == ToDo
 
+* Documentation!
 * Tests! (unit and remote)
 * Log in via guest url
-* SSL
