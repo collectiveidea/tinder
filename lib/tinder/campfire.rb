@@ -2,7 +2,7 @@ module Tinder
   
   # == Usage
   #
-  #   campfire = Campfire.new 'mysubdomain'
+  #   campfire = Tinder::Campfire.new 'mysubdomain'
   #   campfire.login 'myemail@example.com', 'mypassword'
   #   room = campfire.create_room 'New Room', 'My new campfire room to test tinder'
   #   room.speak 'Hello world!'
@@ -10,6 +10,10 @@ module Tinder
   class Campfire
     attr_reader :subdomain, :uri
 
+    # Create a new connection to the campfire account with the given +subdomain+.
+    # There's an optional +:ssl+ option to use SSL for the connection.
+    #
+    #   c = Tinder::Campfire.new("mysubdomain", :ssl => true)
     def initialize(subdomain, options = {})
       options = { :ssl => false }.merge(options)
       @cookie = nil
@@ -17,10 +21,11 @@ module Tinder
       @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.campfirenow.com")
     end
     
+    # Log in to campfire using your +email+ and +password+
     def login(email, password)
       @logged_in = verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for)
     end
-  
+    
     def logged_in?
       @logged_in
     end
@@ -31,15 +36,18 @@ module Tinder
       end
     end
   
+    # Creates and returns a new Room with the given +name+ and optionally a +topic+
     def create_room(name, topic = nil)
       find_room_by_name(name) if verify_response(post("account/create/room?from=lobby", {:room => {:name => name, :topic => topic}}, :ajax => true), :success)
     end
-  
+    
+    # Find a campfire room by name
     def find_room_by_name(name)
       link = Hpricot(get.body).search("//h2/a").detect { |a| a.inner_html == name }
       link.blank? ? nil : Room.new(self, link.attributes['href'].scan(/room\/(\d*)$/).to_s, name)
     end
-
+    
+    # List the users that are currently chatting in any room
     def users(*room_names)
       users = Hpricot(get.body).search("div.room").collect do |room|
         if room_names.empty? || room_names.include?((room/"h2/a").inner_html)
@@ -50,10 +58,11 @@ module Tinder
     end
 
     # Deprecated: only included for backwards compatability
-    def host
+    def host #:nodoc:
       uri.host
     end
     
+    # Is the connection to campfire using ssl?
     def ssl?
       uri.scheme == 'https'
     end
