@@ -21,6 +21,14 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
 * Hpricot
   gem install hpricot
   
+== Installation
+
+Tinder can be installed as a gem or a Rails plugin:
+
+  gem install tinder
+  
+  script/plugin install http://source.collectiveidea.com/public/tinder/trunk
+  
 == Development
 
 The source for Tinder is available at http://source.collectiveidea.com/public/tinder/trunk. Development can be followed at http://opensoul.org/tags/tinder.  Contributions are welcome!
