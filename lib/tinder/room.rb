@@ -14,7 +14,7 @@ module Tinder
     end
     
     def leave
-      verify_response get("/room/#{@room_id}/leave"), :redirect
+      verify_response get("room/#{self.id}/leave"), :redirect
     end
 
     def toggle_guest_access
