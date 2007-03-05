@@ -11,7 +11,7 @@ module Tinder
     attr_reader :subdomain, :uri
 
     # Create a new connection to the campfire account with the given +subdomain+.
-    # There's an optional +:ssl+ option to use SSL for the connection.
+    # There's an +:ssl+ option to use SSL for the connection.
     #
     #   c = Tinder::Campfire.new("mysubdomain", :ssl => true)
     def initialize(subdomain, options = {})
@@ -26,6 +26,7 @@ module Tinder
       @logged_in = verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for)
     end
     
+    # Returns true if you were successfully logged in
     def logged_in?
       @logged_in
     end
@@ -44,7 +45,11 @@ module Tinder
     # Find a campfire room by name
     def find_room_by_name(name)
       link = Hpricot(get.body).search("//h2/a").detect { |a| a.inner_html == name }
-      link.blank? ? nil : Room.new(self, link.attributes['href'].scan(/room\/(\d*)$/).to_s, name)
+      link.blank? ? nil : Room.new(self, room_id_from_url(link.attributes['href']), name)
+    end
+    
+    def find_or_create_room_by_name(name)
+      find_room_by_name(name) || create_room(name)
     end
     
     # List the users that are currently chatting in any room
@@ -56,7 +61,23 @@ module Tinder
       end
       users.flatten.compact.uniq.sort
     end
-
+    
+    # Get the dates of the available transcripts by room
+    #
+    #   campfire.available_transcripts
+    #   #=> {"15840" => [#<Date: 4908311/2,0,2299161>, #<Date: 4908285/2,0,2299161>]}
+    #
+    def available_transcripts(room = nil)
+      url = "files%2Btranscripts"
+      url += "?room_id#{room}" if room
+      transcripts = (Hpricot(get(url).body) / ".transcript").inject({}) do |result,transcript|
+        link = (transcript / "a").first.attributes['href']
+        (result[room_id_from_url(link)] ||= []) << Date.parse(link.scan(/\/transcript\/(\d{4}\/\d{2}\/\d{2})/).to_s)
+        result
+      end
+      room ? transcripts[room.to_s] : transcripts
+    end
+    
     # Deprecated: only included for backwards compatability
     def host #:nodoc:
       uri.host
@@ -68,6 +89,10 @@ module Tinder
     end
   
   private
+  
+    def room_id_from_url(url)
+      url.scan(/room\/(\d*)/).to_s
+    end
 
     def url_for(path = "")
       "#{uri}/#{path}"
@@ -106,7 +131,7 @@ module Tinder
       end
     end
   
-    # flatten a nested hash
+    # flatten a nested hash (:room => {:name => 'foobar'} to 'user[name]' => 'foobar')
     def flatten(params)
       params = params.dup
       params.stringify_keys!.each do |k,v| 

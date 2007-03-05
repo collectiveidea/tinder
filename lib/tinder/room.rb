@@ -136,6 +136,28 @@ module Tinder
       end
       messages
     end
+    
+    # Get the dates for the available transcripts for this room
+    def available_transcripts
+      @campfire.available_transcripts(id)
+    end
+    
+    # Get the transcript for the given date (Returns a hash in the same format as #listen)
+    #
+    #   room.transcript(room.available_transcripts.first)
+    #   #=> [{:message=>"foobar!", :user_id=>"99999", :person=>"Brandon", :id=>"18659245"}]
+    #
+    def transcript(date)
+      (Hpricot(get("room/#{id}/transcript/#{date.to_date.strftime('%Y/%m/%d')}").body) / ".message").collect do |message|
+        person = (message / '.person span').first
+        body = (message / '.body div').first
+        {:id => message.attributes['id'].scan(/message_(\d+)/).to_s,
+          :person => person ? person.inner_html : nil,
+          :user_id => message.attributes['class'].scan(/user_(\d+)/).to_s,
+          :message => body ? body.inner_html : nil
+        }
+      end
+    end
 
   private
 
