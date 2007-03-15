@@ -36,16 +36,23 @@ module Tinder
         @logged_in = !result
       end
     end
+    
+    # Get an array of all the available rooms
+    # TODO: detect rooms that are full (no link)
+    def rooms
+      Hpricot(get.body).search("//h2/a").collect do |a|
+        Room.new(self, room_id_from_url(a.attributes['href']), a.inner_html)
+      end
+    end
   
+    # Find a campfire room by name
+    def find_room_by_name(name)
+      rooms.detect {|room| room.name == name }
+    end
+    
     # Creates and returns a new Room with the given +name+ and optionally a +topic+
     def create_room(name, topic = nil)
       find_room_by_name(name) if verify_response(post("account/create/room?from=lobby", {:room => {:name => name, :topic => topic}}, :ajax => true), :success)
-    end
-    
-    # Find a campfire room by name
-    def find_room_by_name(name)
-      link = Hpricot(get.body).search("//h2/a").detect { |a| a.inner_html == name }
-      link.blank? ? nil : Room.new(self, room_id_from_url(link.attributes['href']), name)
     end
     
     def find_or_create_room_by_name(name)
