@@ -12,12 +12,12 @@ module Tinder
     # Join the room. Pass +true+ to join even if you've already joined.
     def join(force = false)
       @room = returning(get("room/#{id}")) do |room|
-        return false unless verify_response(room, :success)
+        raise Error, "Could not join room" unless verify_response(room, :success)
         @membership_key = room.body.scan(/\"membershipKey\": \"([a-z0-9]+)\"/).to_s
         @user_id = room.body.scan(/\"userID\": (\d+)/).to_s
         @last_cache_id = room.body.scan(/\"lastCacheID\": (\d+)/).to_s
         @timestamp = room.body.scan(/\"timestamp\": (\d+)/).to_s
-      end unless @room || force
+      end if @room.nil? || force
       true
     end
     
@@ -30,13 +30,19 @@ module Tinder
 
     # Toggle guest access on or off
     def toggle_guest_access
-      verify_response(post("room/#{id}/toggle_guest_access"), :success)
+      # re-join the room to get the guest url
+      verify_response(post("room/#{id}/toggle_guest_access"), :success) && join(true)
     end
 
     # Get the url for guest access
     def guest_url
       join
-      (Hpricot(@room.body)/"#guest_access h4").first.inner_html
+      link = (Hpricot(@room.body)/"#guest_access h4").first
+      link.inner_html if link
+    end
+    
+    def guest_access_enabled?
+      !guest_url.nil?
     end
 
     # The invite code use for guest

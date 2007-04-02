@@ -23,12 +23,15 @@ module Tinder
     
     # Log in to campfire using your +email+ and +password+
     def login(email, password)
-      @logged_in = verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for)
+      unless verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for(:only_path => false))
+        raise Error, "Campfire login failed"
+      end
+      @logged_in = true
     end
     
-    # Returns true if you were successfully logged in
+    # Returns true when successfully logged in
     def logged_in?
-      @logged_in
+      @logged_in === true
     end
   
     def logout
@@ -101,8 +104,10 @@ module Tinder
       url.scan(/room\/(\d*)/).to_s
     end
 
-    def url_for(path = "")
-      "#{uri}/#{path}"
+    def url_for(*args)
+      options = {:only_path => true}.merge(args.last.is_a?(Hash) ? args.pop : {})
+      path = args.shift
+      "#{options[:only_path] ? '' : uri}/#{path}"
     end
 
     def post(path, data = {}, options = {})
@@ -120,6 +125,7 @@ module Tinder
   
     def prepare_request(request, options = {})
       returning request do
+        request.add_field 'User-Agent', "Tinder/#{Tinder::VERSION::STRING} (http://tinder.rubyforge.org)"
         request.add_field 'Cookie', @cookie if @cookie
         if options[:ajax]
           request.add_field 'X-Requested-With', 'XMLHttpRequest'
@@ -163,6 +169,6 @@ module Tinder
         false
       end
     end
-  
+    
   end
 end
