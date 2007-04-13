@@ -23,7 +23,7 @@ module Tinder
     
     # Leave a room
     def leave
-      returning verify_response(get("room/#{id}/leave"), :redirect) do
+      returning verify_response(post("room/#{id}/leave"), :redirect) do
         @room, @membership_key, @user_id, @last_cache_id, @timestamp = nil
       end
     end
