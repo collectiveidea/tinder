@@ -1,3 +1,6 @@
+0.1.5
+* Fixed Room#leave, which was broken by a Campfire deployment [Andy Smith]
+
 0.1.4
 * Support for transcripts
 
