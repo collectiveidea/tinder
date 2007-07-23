@@ -7,6 +7,3 @@ lib/tinder.rb
 lib/tinder/campfire.rb
 lib/tinder/room.rb
 lib/tinder/version.rb
-test/remote/remote_campfire_test.rb
-test/test_helper.rb
-test/unit/campfire_test.rb
