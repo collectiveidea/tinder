@@ -1,4 +1,4 @@
-0.1.4
+0.1.4 - 2007-07-23
 * Support for transcripts
 * Fixed Room#leave, which was broken by a Campfire deployment [Andy Smith]
 
