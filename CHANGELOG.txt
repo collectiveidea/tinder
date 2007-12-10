@@ -1,3 +1,6 @@
+0.1.5
+* Fixed timeout when listening but not speaking that will eventually log you out [Clinton R. Nixon]
+
 0.1.4 - 2007-07-23
 * Support for transcripts
 * Fixed Room#leave, which was broken by a Campfire deployment [Andy Smith]

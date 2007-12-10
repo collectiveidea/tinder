@@ -17,14 +17,16 @@ module Tinder
         @user_id = room.body.scan(/\"userID\": (\d+)/).to_s
         @last_cache_id = room.body.scan(/\"lastCacheID\": (\d+)/).to_s
         @timestamp = room.body.scan(/\"timestamp\": (\d+)/).to_s
+        @idle_since = Time.now
       end if @room.nil? || force
+      ping
       true
     end
     
     # Leave a room
     def leave
       returning verify_response(post("room/#{id}/leave"), :redirect) do
-        @room, @membership_key, @user_id, @last_cache_id, @timestamp = nil
+        @room, @membership_key, @user_id, @last_cache_id, @timestamp, @idle_since = nil
       end
     end
 
@@ -71,6 +73,12 @@ module Tinder
       verify_response(post("room/#{id}/unlock", {}, :ajax => true), :success)
     end
 
+    def ping(force = false)
+      returning verify_response(post("room/#{id}/tabs", { }, :ajax => true), :success) do
+        @idle_since = Time.now
+      end unless @idle_since > 1.minute.ago || force
+    end
+
     def destroy
       verify_response(post("account/delete/room/#{id}"), :success)
     end
@@ -113,20 +121,29 @@ module Tinder
       join
       continue = true
       while(continue)
+        ping
         messages = []
-        response = post("poll.fcgi", :l => @last_cache_id, :m => @membership_key, :s => @timestamp, :t => "#{Time.now.to_i}000")
+        response = post("poll.fcgi", {:l => @last_cache_id, :m => @membership_key,
+          :s => @timestamp, :t => "#{Time.now.to_i}000"}, :ajax => true)
         if response.body.length > 1
+          # deal with "chat.redirectTo('/');" - relogin
+          join(true) && retry if response.body.match('chat\.redirectTo')
+
           lines = response.body.split("\r\n")
           if lines.length > 0
             @last_cache_id = lines.pop.scan(/chat.poller.lastCacheID = (\d+)/).to_s
             lines.each do |msg|
               unless msg.match(/timestamp_message/)
-                messages << {
-                  :id => msg.scan(/message_(\d+)/).to_s,
-                  :user_id => msg.scan(/user_(\d+)/).to_s,
-                  :person => msg.scan(/<span>(.+)<\/span>/).to_s,
-                  :message => msg.scan(/<div>(.+)<\/div>/).to_s
-                }
+                # pull out only the chat.transcript.queueMessage part for now
+                msg = msg.scan(/(chat\.transcript\.queueMessage(?:.+?);)/).to_s
+                if msg.length > 0
+                  messages << {
+                    :id => msg.scan(/message_(\d+)/).to_s,
+                    :user_id => msg.scan(/user_(\d+)/).to_s,
+                    :person => msg.scan(/<td class=\\"person\\">(?:<span>)?(.+?)(?:<\/span>)?<\/td>/).to_s,
+                    :message => msg.scan(/<td class=\\"body\\"><div>(.+?)<\/div><\/td>/).to_s
+                  }
+                end
               end
             end
           end
