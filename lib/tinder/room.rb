@@ -86,14 +86,15 @@ module Tinder
     end
 
     # Post a new message to the chat room
-    def speak(message)
+    def speak(message, options = {})
       join
-      send message
+      message if verify_response(post("room/#{id}/speak", {:message => message,
+        :t => Time.now.to_i}.merge(options), :ajax => true), :success)
     end
-    
+
     def paste(message)
       join
-      send message, { :paste => true }
+      speak message, :paste => true
     end
     
     # Get the list of users currently chatting for this room
@@ -197,10 +198,6 @@ module Tinder
 
     def verify_response(*args)
       @campfire.send :verify_response, *args
-    end
-
-    def send(message, options = {})
-      message if verify_response(post("room/#{id}/speak", { :message => message, :t => Time.now.to_i }.merge(options), :ajax => true), :success)
     end
 
   end
