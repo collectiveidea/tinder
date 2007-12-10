@@ -129,7 +129,7 @@ module Tinder
         request.add_field 'Cookie', @cookie if @cookie
         if options[:ajax]
           request.add_field 'X-Requested-With', 'XMLHttpRequest'
-          request.add_field 'X-Prototype-Version', '1.5.0_rc1'
+          request.add_field 'X-Prototype-Version', '1.5.1.1'
         end
       end
     end
