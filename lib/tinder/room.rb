@@ -44,11 +44,13 @@ module Tinder
     end
     
     def guest_access_enabled?
+      join
       !guest_url.nil?
     end
 
     # The invite code use for guest
     def guest_invite_code
+      join
       guest_url.scan(/\/(\w*)$/).to_s
     end
 
