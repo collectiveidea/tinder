@@ -78,7 +78,7 @@ module Tinder
     def ping(force = false)
       returning verify_response(post("room/#{id}/tabs", { }, :ajax => true), :success) do
         @idle_since = Time.now
-      end unless @idle_since > 1.minute.ago || force
+      end unless @idle_since <= 1.minute.ago || force
     end
 
     def destroy
@@ -101,7 +101,7 @@ module Tinder
       @campfire.users name
     end
     
-    # Get and array of the messages that have been posted to the room since you joined. Each
+    # Get and array of the messages that have been posted to the room. Each
     # messages is a hash with:
     # * +:person+: the display name of the person that posted the message
     # * +:message+: the body of the message
@@ -111,55 +111,25 @@ module Tinder
     #   room.listen
     #   #=> [{:person=>"Brandon", :message=>"I'm getting very sleepy", :user_id=>"148583", :id=>"16434003"}]
     #
-    # listen also takes an optional block, which then polls for new messages every 5 seconds
-    # and calls the block for each message.
+    # Called without a block, listen will return an array of messages that have been
+    # posted since you joined. listen also takes an optional block, which then polls
+    # for new messages every 5 seconds and calls the block for each message.
     #
     #   room.listen do |m|
     #     room.speak "#{m[:person]}, Go away!" if m[:message] =~ /Java/i
     #   end
     #
     def listen
-      # FIXME: this method needs refactored!
       join
-      continue = true
-      while(continue)
-        ping
-        messages = []
-        response = post("poll.fcgi", {:l => @last_cache_id, :m => @membership_key,
-          :s => @timestamp, :t => "#{Time.now.to_i}000"}, :ajax => true)
-        if response.body.length > 1
-          # deal with "chat.redirectTo('/');" - relogin
-          join(true) && retry if response.body.match('chat\.redirectTo')
-
-          lines = response.body.split("\r\n")
-          if lines.length > 0
-            @last_cache_id = lines.pop.scan(/chat.poller.lastCacheID = (\d+)/).to_s
-            lines.each do |msg|
-              unless msg.match(/timestamp_message/)
-                # pull out only the chat.transcript.queueMessage part for now
-                msg = msg.scan(/(chat\.transcript\.queueMessage(?:.+?);)/).to_s
-                if msg.length > 0
-                  messages << {
-                    :id => msg.scan(/message_(\d+)/).to_s,
-                    :user_id => msg.scan(/user_(\d+)/).to_s,
-                    :person => msg.scan(/<td class=\\"person\\">(?:<span>)?(.+?)(?:<\/span>)?<\/td>/).to_s,
-                    :message => msg.scan(/<td class=\\"body\\"><div>(.+?)<\/div><\/td>/).to_s
-                  }
-                end
-              end
-            end
-          end
-        end
-        if block_given?
-          messages.each do |msg|
-            yield msg
-          end
+      if block_given?
+        loop do
+          ping
+          self.messages.each {|msg| yield msg }
           sleep 5
-        else
-          continue = false
         end
+      else
+        self.messages
       end
-      messages
     end
     
     # Get the dates for the available transcripts for this room
@@ -186,6 +156,37 @@ module Tinder
 
   private
 
+    def messages
+      returning [] do |messages|
+        messages = []
+        response = post("poll.fcgi", {:l => @last_cache_id, :m => @membership_key,
+          :s => @timestamp, :t => "#{Time.now.to_i}000"}, :ajax => true)
+        if response.body.length > 1
+          # deal with "chat.redirectTo('/');" - relogin
+          join(true) && self.mess if response.body.match('chat\.redirectTo')
+
+          lines = response.body.split("\r\n")
+          if lines.length > 0
+            @last_cache_id = lines.pop.scan(/chat.poller.lastCacheID = (\d+)/).to_s
+            lines.each do |msg|
+              unless msg.match(/timestamp_message/)
+                # pull out only the chat.transcript.queueMessage part for now
+                msg = msg.scan(/(chat\.transcript\.queueMessage(?:.+?);)/).to_s
+                if msg.length > 0
+                  messages << {
+                    :id => msg.scan(/message_(\d+)/).to_s,
+                    :user_id => msg.scan(/user_(\d+)/).to_s,
+                    :person => msg.scan(/<td class=\\"person\\">(?:<span>)?(.+?)(?:<\/span>)?<\/td>/).to_s,
+                    :message => msg.scan(/<td class=\\"body\\"><div>(.+?)<\/div><\/td>/).to_s
+                  }
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  
     def post(*args)
       @campfire.send :post, *args
     end
