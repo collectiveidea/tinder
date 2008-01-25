@@ -9,7 +9,6 @@ module Tinder
   #   room.destroy
   class Campfire
     attr_reader :subdomain, :uri
-    attr_accessor :logger
 
     # Create a new connection to the campfire account with the given +subdomain+.
     # There's an +:ssl+ option to use SSL for the connection.
@@ -17,7 +16,6 @@ module Tinder
     #   c = Tinder::Campfire.new("mysubdomain", :ssl => true)
     def initialize(subdomain, options = {})
       options = { :ssl => false }.merge(options)
-      self.logger = options[:logger] || Logger.new('/dev/null')
       @cookie = nil
       @subdomain = subdomain
       @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.campfirenow.com")
@@ -47,7 +45,7 @@ module Tinder
     # TODO: detect rooms that are full (no link)
     def rooms
       Hpricot(get.body).search("//h2/a").collect do |a|
-        Room.new(self, room_id_from_url(a.attributes['href']), a.inner_html, logger)
+        Room.new(self, room_id_from_url(a.attributes['href']), a.inner_html)
       end
     end
   
@@ -142,11 +140,6 @@ module Tinder
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = ssl?
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ssl?
-      if logger.debug?
-        io = StringIO.new
-        @request.exec(io, '1.1', @request.path)
-        logger.debug io.string
-      end
       @response = returning http.request(@request) do |response|
         @cookie = response['set-cookie'] if response['set-cookie']
       end

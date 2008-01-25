@@ -7,7 +7,6 @@ module Tinder
       @campfire = campfire
       @id = id
       @name = name
-      @logger = logger
     end
     
     # Join the room. Pass +true+ to join even if you've already joined.
@@ -19,7 +18,6 @@ module Tinder
         @last_cache_id = room.body.scan(/\"lastCacheID\": (\d+)/).to_s
         @timestamp = room.body.scan(/\"timestamp\": (\d+)/).to_s
         @idle_since = Time.now
-        logger.debug "joined room #{id}: membership_key: #{@membership_key}, user_id: #{@user_id}, last_cache_id: #{@last_cache_id}, timestamp: #{@timestamp}"
       end if @room.nil? || force
       ping
       true
@@ -28,14 +26,12 @@ module Tinder
     # Leave a room
     def leave
       returning verify_response(post("room/#{id}/leave"), :redirect) do
-        logger.debug "Left room #{id}"
         @room, @membership_key, @user_id, @last_cache_id, @timestamp, @idle_since = nil
       end
     end
 
     # Toggle guest access on or off
     def toggle_guest_access
-      logger.debug "toggling guest access for room #{id}"
       # re-join the room to get the guest url
       verify_response(post("room/#{id}/toggle_guest_access"), :success) && join(true)
     end
@@ -71,25 +67,21 @@ module Tinder
     
     # Lock the room to prevent new users from entering and to disable logging
     def lock
-      logger.debug "locking room #{id}"
       verify_response(post("room/#{id}/lock", {}, :ajax => true), :success)
     end
 
     # Unlock the room
     def unlock
-      logger.debug "unlocking room #{id}"
       verify_response(post("room/#{id}/unlock", {}, :ajax => true), :success)
     end
 
     def ping(force = false)
       returning verify_response(post("room/#{id}/tabs", { }, :ajax => true), :success) do
-        logger.debug "pinged room #{id}"
         @idle_since = Time.now
       end if @idle_since < 1.minute.ago || force
     end
 
     def destroy
-      logger.debug "destroying room #{id}"
       verify_response(post("account/delete/room/#{id}"), :success)
     end
 
