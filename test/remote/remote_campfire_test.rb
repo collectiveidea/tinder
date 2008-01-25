@@ -4,7 +4,7 @@ class RemoteCampfireTest < Test::Unit::TestCase
   
   def setup
     @campfire = Tinder::Campfire.new 'domain'
-    #@user, @pass = 'email@example.com', 'password'
+    # @user, @pass = 'email@example.com', 'password'
     raise "Set your campfire credentials before running the remote tests" unless @user && @pass
   end
   
@@ -29,7 +29,7 @@ class RemoteCampfireTest < Test::Unit::TestCase
   end
   
   def test_failed_login
-    assert !@campfire.login(@user, 'notmypassword')
+    assert_raises(Tinder::Error) { @campfire.login(@user, 'notmypassword') }
     assert !@campfire.logged_in?
   end
   

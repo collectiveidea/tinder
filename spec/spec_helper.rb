@@ -1,5 +1,3 @@
 require 'rubygems'
-require 'active_support'
 require 'spec'
-require 'breakpoint'
 require File.dirname(__FILE__) + '/../lib/tinder.rb'

@@ -7,6 +7,7 @@ module Tinder
       @campfire = campfire
       @id = id
       @name = name
+      @logger = logger
     end
     
     # Join the room. Pass +true+ to join even if you've already joined.
@@ -18,6 +19,7 @@ module Tinder
         @last_cache_id = room.body.scan(/\"lastCacheID\": (\d+)/).to_s
         @timestamp = room.body.scan(/\"timestamp\": (\d+)/).to_s
         @idle_since = Time.now
+        logger.debug "joined room #{id}: membership_key: #{@membership_key}, user_id: #{@user_id}, last_cache_id: #{@last_cache_id}, timestamp: #{@timestamp}"
       end if @room.nil? || force
       ping
       true
@@ -26,12 +28,14 @@ module Tinder
     # Leave a room
     def leave
       returning verify_response(post("room/#{id}/leave"), :redirect) do
+        logger.debug "Left room #{id}"
         @room, @membership_key, @user_id, @last_cache_id, @timestamp, @idle_since = nil
       end
     end
 
     # Toggle guest access on or off
     def toggle_guest_access
+      logger.debug "toggling guest access for room #{id}"
       # re-join the room to get the guest url
       verify_response(post("room/#{id}/toggle_guest_access"), :success) && join(true)
     end
@@ -67,21 +71,25 @@ module Tinder
     
     # Lock the room to prevent new users from entering and to disable logging
     def lock
+      logger.debug "locking room #{id}"
       verify_response(post("room/#{id}/lock", {}, :ajax => true), :success)
     end
 
     # Unlock the room
     def unlock
+      logger.debug "unlocking room #{id}"
       verify_response(post("room/#{id}/unlock", {}, :ajax => true), :success)
     end
 
     def ping(force = false)
       returning verify_response(post("room/#{id}/tabs", { }, :ajax => true), :success) do
+        logger.debug "pinged room #{id}"
         @idle_since = Time.now
-      end unless @idle_since <= 1.minute.ago || force
+      end if @idle_since < 1.minute.ago || force
     end
 
     def destroy
+      logger.debug "destroying room #{id}"
       verify_response(post("account/delete/room/#{id}"), :success)
     end
 
@@ -120,13 +128,13 @@ module Tinder
     #     room.speak "#{m[:person]}, Go away!" if m[:message] =~ /Java/i
     #   end
     #
-    def listen
+    def listen(interval = 5)
       join
       if block_given?
         loop do
           ping
           self.messages.each {|msg| yield msg }
-          sleep 5
+          sleep interval
         end
       else
         self.messages
@@ -155,18 +163,18 @@ module Tinder
       end
     end
 
-  private
+  protected
 
     def messages
       returning [] do |messages|
-        messages = []
         response = post("poll.fcgi", {:l => @last_cache_id, :m => @membership_key,
           :s => @timestamp, :t => "#{Time.now.to_i}000"}, :ajax => true)
         if response.body.length > 1
           # deal with "chat.redirectTo('/');" - relogin
-          join(true) && self.mess if response.body.match('chat\.redirectTo')
+          join(true) && self.messages if response.body.match('chat\.redirectTo')
 
           lines = response.body.split("\r\n")
+          
           if lines.length > 0
             @last_cache_id = lines.pop.scan(/chat.poller.lastCacheID = (\d+)/).to_s
             lines.each do |msg|
@@ -177,8 +185,8 @@ module Tinder
                   messages << {
                     :id => msg.scan(/message_(\d+)/).to_s,
                     :user_id => msg.scan(/user_(\d+)/).to_s,
-                    :person => msg.scan(/<td class=\\"person\\">(?:<span>)?(.+?)(?:<\/span>)?<\/td>/).to_s,
-                    :message => msg.scan(/<td class=\\"body\\"><div>(.+?)<\/div><\/td>/).to_s
+                    :person => msg.scan(/\\u003Ctd class=\\"person\\"\\u003E(?:\\u003Cspan\\u003E)?(.+?)(?:\\u003C\/span\\u003E)?\\u003C\/td\\u003E/).to_s,
+                    :message => msg.scan(/\\u003Ctd class=\\"body\\"\\u003E\\u003Cdiv\\u003E(.+?)\\u003C\/div\\u003E\\u003C\/td\\u003E/).to_s
                   }
                 end
               end
