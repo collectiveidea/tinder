@@ -1,4 +1,5 @@
-0.1.5
+0.1.5 - 2008-01-25
+* Fixed Room#listen, which was broken by latest Campfire deploy
 * Fixed timeout when listening but not speaking that will eventually log you out [Clinton R. Nixon]
 
 0.1.4 - 2007-07-23
