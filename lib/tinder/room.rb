@@ -65,6 +65,16 @@ module Tinder
       topic if verify_response(post("room/#{id}/change_topic", { 'room' => { 'topic' => topic }}, :ajax => true), :success)
     end
     
+    # Get the current topic
+    def topic
+      join
+      h = (Hpricot(@room.body)/"#topic")
+      if h
+        (h/:span).remove
+        h.inner_text.strip
+      end
+    end
+    
     # Lock the room to prevent new users from entering and to disable logging
     def lock
       verify_response(post("room/#{id}/lock", {}, :ajax => true), :success)
