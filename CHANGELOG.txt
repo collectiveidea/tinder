@@ -1,4 +1,4 @@
-TRUNK
+0.1.6 - 2008-03-07
 * Added Room#topic for getting the current topic [Even Weaver]
 * Trap INT in #listen(&block) [borrowed from Chris Shea's Pyre]
 
