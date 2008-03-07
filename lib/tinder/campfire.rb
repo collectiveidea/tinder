@@ -89,11 +89,6 @@ module Tinder
       room ? transcripts[room.to_s] : transcripts
     end
     
-    # Deprecated: only included for backwards compatability
-    def host #:nodoc:
-      uri.host
-    end
-    
     # Is the connection to campfire using ssl?
     def ssl?
       uri.scheme == 'https'
