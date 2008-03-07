@@ -1,5 +1,6 @@
 TRUNK
 * Added Room#topic for getting the current topic [Even Weaver]
+* Trap INT in #listen(&block) [borrowed from Chris Shea's Pyre]
 
 0.1.5 - 2008-01-25
 * Fixed Room#listen, which was broken by latest Campfire deploy

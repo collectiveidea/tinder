@@ -133,10 +133,13 @@ module Tinder
     def listen(interval = 5)
       join
       if block_given?
-        loop do
-          ping
-          self.messages.each {|msg| yield msg }
-          sleep interval
+        catch(:stop_listening) do
+          trap('INT') { throw :stop_listening }
+          loop do
+            ping
+            self.messages.each {|msg| yield msg }
+            sleep interval
+          end
         end
       else
         self.messages
@@ -198,16 +201,10 @@ module Tinder
       end
     end
   
-    def post(*args)
-      @campfire.send :post, *args
-    end
-
-    def get(*args)
-      @campfire.send :get, *args
-    end
-
-    def verify_response(*args)
-      @campfire.send :verify_response, *args
+    [:post, :get, :verify_response].each do |method|
+      define_method method do |*args|
+        @campfire.send method, *args
+      end
     end
 
   end
