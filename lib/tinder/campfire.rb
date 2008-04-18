@@ -11,7 +11,11 @@ module Tinder
     attr_reader :subdomain, :uri
 
     # Create a new connection to the campfire account with the given +subdomain+.
-    # There's an +:ssl+ option to use SSL for the connection.
+    #
+    # == Options:
+    # * +:ssl+: use SSL for the connection, which is required if you have a Campfire SSL account.
+    #           Defaults to false
+    # * +:proxy+: a proxy URI. (e.g. :proxy => 'http://user:pass@example.com:8000')
     #
     #   c = Tinder::Campfire.new("mysubdomain", :ssl => true)
     def initialize(subdomain, options = {})
@@ -19,6 +23,12 @@ module Tinder
       @cookie = nil
       @subdomain = subdomain
       @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.campfirenow.com")
+      if options[:proxy]
+        uri = URI.parse(options[:proxy])
+        @http = Net::HTTP::Proxy(uri.host, uri.port, uri.user, uri.password)
+      else
+        @http = Net::HTTP
+      end
       @logged_in = false
     end
     
@@ -32,7 +42,7 @@ module Tinder
     
     # Returns true when successfully logged in
     def logged_in?
-      @logged_in === true
+      @logged_in == true
     end
   
     def logout
@@ -132,7 +142,7 @@ module Tinder
     
     def perform_request(options = {}, &block)
       @request = prepare_request(yield, options)
-      http = Net::HTTP.new(uri.host, uri.port)
+      http = @http.new(uri.host, uri.port)
       http.use_ssl = ssl?
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ssl?
       @response = returning http.request(@request) do |response|
@@ -154,8 +164,8 @@ module Tinder
     def verify_response(response, options = {})
       if options.is_a?(Symbol)
         codes = case options
-        when :success then [200]
-        when :redirect then 300..399
+        when :success; [200]
+        when :redirect; 300..399
         else raise ArgumentError.new("Unknown response #{options}")
         end
         codes.include?(response.code.to_i)
