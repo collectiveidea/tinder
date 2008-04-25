@@ -10,4 +10,5 @@ Dir[File.join(File.dirname(__FILE__), 'tinder/**/*.rb')].sort.each { |lib| requi
 
 module Tinder
   class Error < StandardError; end
+  class SSLRequiredError < Error; end
 end

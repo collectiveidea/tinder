@@ -37,6 +37,8 @@ module Tinder
       unless verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for(:only_path => false))
         raise Error, "Campfire login failed"
       end
+      # ensure that SSL is set if required on this account
+      raise SSLRequiredError, "Your account requires SSL" unless verify_response(get, :success)
       @logged_in = true
     end
     
@@ -166,7 +168,7 @@ module Tinder
         codes = case options
         when :success; [200]
         when :redirect; 300..399
-        else raise ArgumentError.new("Unknown response #{options}")
+        else raise(ArgumentError, "Unknown response #{options}")
         end
         codes.include?(response.code.to_i)
       elsif options[:redirect_to]

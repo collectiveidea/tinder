@@ -3,9 +3,20 @@ require File.dirname(__FILE__) + '/../test_helper'
 class RemoteCampfireTest < Test::Unit::TestCase
   
   def setup
-    @campfire = Tinder::Campfire.new 'domain'
+    # @subdomain = 'domain'
     # @user, @pass = 'email@example.com', 'password'
-    raise "Set your campfire credentials before running the remote tests" unless @user && @pass
+    @ssl = false
+    raise "Set your campfire credentials before running the remote tests" unless @user && @pass && @subdomain
+    @campfire = Tinder::Campfire.new @subdomain, :ssl => @ssl
+  end
+  
+  def test_ssl_required
+    if @ssl
+      campfire = Tinder::Campfire.new @subdomain
+      assert_raises(Tinder::SSLRequiredError) do
+        campfire.login(@user, @pass)
+      end
+    end
   end
   
   def test_create_and_delete_room
