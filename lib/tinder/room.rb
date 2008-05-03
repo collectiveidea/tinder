@@ -185,7 +185,7 @@ module Tinder
             lines.each do |msg|
               unless msg.match(/timestamp_message/)
                 # pull out only the chat.transcript.queueMessage part for now
-                msg = msg.scan(/(chat\.transcript\.queueMessage(?:.+?);)/).to_s
+                msg = msg.scan(/(chat\.transcript\.queueMessage(?:.+?)\);)/).to_s
                 if msg.length > 0
                   messages << {
                     :id => msg.scan(/message_(\d+)/).to_s,

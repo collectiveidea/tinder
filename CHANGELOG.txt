@@ -1,5 +1,6 @@
 0.1.7 - unreleased
 * Added support for HTTP proxies
+* Fix listening for messages that contain URLs [Jared Kuolt]
 
 0.1.6 - 2008-03-07
 * Added Room#topic for getting the current topic [Even Weaver]
