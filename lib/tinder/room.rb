@@ -175,9 +175,6 @@ module Tinder
         response = post("poll.fcgi", {:l => @last_cache_id, :m => @membership_key,
           :s => @timestamp, :t => "#{Time.now.to_i}000"}, :ajax => true)
         if response.body.length > 1
-          # deal with "chat.redirectTo('/');" - relogin
-          join(true) && self.messages if response.body.match('chat\.redirectTo')
-
           lines = response.body.split("\r\n")
           
           if lines.length > 0
