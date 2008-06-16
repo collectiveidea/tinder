@@ -44,13 +44,11 @@ module Tinder
     end
     
     def guest_access_enabled?
-      join
       !guest_url.nil?
     end
 
     # The invite code use for guest
     def guest_invite_code
-      join
       guest_url.scan(/\/(\w*)$/).to_s
     end
 
@@ -97,13 +95,11 @@ module Tinder
 
     # Post a new message to the chat room
     def speak(message, options = {})
-      join
       message if verify_response(post("room/#{id}/speak", {:message => message,
         :t => Time.now.to_i}.merge(options), :ajax => true), :success)
     end
 
     def paste(message)
-      join
       speak message, :paste => true
     end
     
