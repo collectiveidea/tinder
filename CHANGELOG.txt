@@ -1,4 +1,4 @@
-0.1.7 - unreleased
+0.1.7 - 2008-07-24
 * Don't join the room when only speaking [Brian Donovan]
 * Added support for HTTP proxies
 * Fix listening for messages that contain URLs [Jared Kuolt]
