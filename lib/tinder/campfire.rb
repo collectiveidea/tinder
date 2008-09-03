@@ -4,9 +4,13 @@ module Tinder
   #
   #   campfire = Tinder::Campfire.new 'mysubdomain'
   #   campfire.login 'myemail@example.com', 'mypassword'
+  #
   #   room = campfire.create_room 'New Room', 'My new campfire room to test tinder'
   #   room.speak 'Hello world!'
   #   room.destroy
+  #
+  #   room = campfire.find_room_by_guest_hash 'abc123', 'John Doe'
+  #   room.speak 'Hello world!'
   class Campfire
     attr_reader :subdomain, :uri
 
@@ -64,6 +68,13 @@ module Tinder
     # Find a campfire room by name
     def find_room_by_name(name)
       rooms.detect {|room| room.name == name }
+    end
+
+    # Find a campfire room by its guest hash
+    def find_room_by_guest_hash(hash, name)
+      res = post(hash, :name => name)
+
+      Room.new(self, room_id_from_url(res['location'])) if verify_response(res, :redirect)
     end
     
     # Creates and returns a new Room with the given +name+ and optionally a +topic+

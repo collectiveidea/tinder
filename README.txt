@@ -6,11 +6,15 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
 
   campfire = Campfire.new 'mysubdomain'
   campfire.login 'myemail@example.com', 'mypassword'
+
   room = campfire.create_room 'New Room', 'My new campfire room to test tinder'
   room.rename 'New Room Name'
   room.speak 'Hello world!'
   room.paste "my pasted\ncode"
   room.destroy
+
+  room = campfire.find_room_by_guest_hash 'abc123', 'John Doe'
+  room.speak 'Hello world!'
   
   See the RDoc for more details.
 
@@ -36,5 +40,4 @@ The source for Tinder is available at http://source.collectiveidea.com/public/ti
 == ToDo
 
 * Tests! (unit and remote)
-* Log in via guest url
 * Marshmallow-style integration scripts for exception notification and continuous integration

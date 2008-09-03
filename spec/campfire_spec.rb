@@ -109,5 +109,32 @@ context "A failed login" do
     @campfire.logged_in?.should equal(false)
   end
   
-  
+end
+
+context "Accessing a room with guest access" do
+
+  setup do
+    @room_id = 123
+    @campfire = Tinder::Campfire.new 'foobar'
+    @response = mock("response")
+    @campfire.stub!(:post).and_return(@response)
+  end
+
+  specify "should return a room for the public room" do
+    @response.should_receive(:code).and_return(302)
+    @response.should_receive(:[]).with("location").and_return("/rooms/#{@room_id}")
+
+    room = @campfire.find_room_by_guest_hash "valid_hash", "John Doe"
+    room.should be_kind_of(Tinder::Room)
+    room.campfire.should == @campfire
+    room.id.to_i.should == @room_id
+  end
+
+  specify "should raise an error if given an invalid room hash" do
+    @response.should_receive(:code).and_return(500)
+
+    room = @campfire.find_room_by_guest_hash "invalid_hash", "John Doe"
+    room.should be_nil
+  end
+
 end
