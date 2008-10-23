@@ -1,3 +1,6 @@
+0.1.8
+* Join rooms as a guest
+
 0.1.7 - 2008-07-24
 * Don't join the room when only speaking [Brian Donovan]
 * Added support for HTTP proxies
