@@ -172,6 +172,19 @@ module Tinder
         }
       end
     end
+    
+    def upload(filename)
+      params = {}
+      file = File.open(filename, "rb")
+      params["upload"] = file
+      params["submit"] = "Upload"
+      mp_post = Multipart::MultipartPost.new(params)
+      file.close
+      
+      res = post("upload.cgi/room/#{@id}/uploads/new", mp_post.query, :multipart => true)
+      
+    end
+    
 
   protected
     

@@ -138,8 +138,11 @@ module Tinder
     def post(path, data = {}, options = {})
       perform_request(options) do
         returning Net::HTTP::Post.new(url_for(path)) do |request|
-          request.add_field 'Content-Type', 'application/x-www-form-urlencoded'
-          request.set_form_data flatten(data)
+          if options[:multipart]
+            request.body = data
+          else
+            request.set_form_data(flatten(data))
+          end
         end
       end
     end
@@ -155,6 +158,11 @@ module Tinder
         if options[:ajax]
           request.add_field 'X-Requested-With', 'XMLHttpRequest'
           request.add_field 'X-Prototype-Version', '1.5.1.1'
+        end
+        if options[:multipart]
+          request.add_field 'Content-Type', 'multipart/form-data, boundary=' + Multipart::MultipartPost::BOUNDARY + " "
+        else
+          request.add_field 'Content-Type', 'application/x-www-form-urlencoded'
         end
       end
     end
