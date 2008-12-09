@@ -1,5 +1,12 @@
 require 'rubygems'
 require 'hoe'
+begin
+  require 'spec/rake/spectask'
+rescue LoadError
+  puts 'To use rspec for testing you must install rspec gem:'
+  puts '$ sudo gem install rspec'
+  exit
+end
 require File.join(File.dirname(__FILE__), 'lib', 'tinder', 'version')
 
 # RDOC_OPTS = ['--quiet', '--title', "Tinder",
@@ -22,3 +29,12 @@ hoe = Hoe.new('tinder', ENV['VERSION'] || Tinder::VERSION::STRING) do |p|
   p.extra_deps << ['activesupport']
   p.extra_deps << ['hpricot']
 end
+
+desc "Run the specs under spec"
+Spec::Rake::SpecTask.new do |t|
+  t.spec_opts = ['--options', "spec/spec.opts"]
+  t.spec_files = FileList['spec/**/*_spec.rb']
+end
+
+desc "Default task is to run specs"
+task :default => :spec
