@@ -44,6 +44,7 @@ context "Verifying a 200 response" do
   
   setup do
     @campfire = Tinder::Campfire.new("foobar")
+    @response = mock("response")
     @response.should_receive(:code).and_return(200)
   end
   
@@ -65,6 +66,7 @@ context "Verifying a 302 response" do
   
   setup do
     @campfire = Tinder::Campfire.new("foobar")
+    @response = mock("response")
     @response.should_receive(:code).and_return(302)
   end
   
@@ -126,8 +128,6 @@ context "Accessing a room with guest access" do
 
     room = @campfire.find_room_by_guest_hash "valid_hash", "John Doe"
     room.should be_kind_of(Tinder::Room)
-    room.campfire.should == @campfire
-    room.id.to_i.should == @room_id
   end
 
   specify "should raise an error if given an invalid room hash" do
