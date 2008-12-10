@@ -138,3 +138,51 @@ context "Accessing a room with guest access" do
   end
 
 end
+
+describe "Accessing a room" do
+
+  before do
+    @request = mock("request")
+    @response = mock("response")
+    Net::HTTP.stub!(:new).and_return(@request)
+    @request.stub!(:use_ssl=)
+    @request.stub!(:request).and_return(@response)
+    @response.stub!(:[]).and_return(true)
+  end
+
+  describe "when the room is full" do
+  
+    before do
+      @html = File.read(File.dirname(__FILE__) + '/html/full_lobby.html')
+      @response.stub!(:body).and_return(@html)
+      @campfire = Tinder::Campfire.new 'foobar'
+    end
+  
+    it "should return a room" do
+      @campfire.rooms.should_not be_empty
+    end
+    
+    it "should find a room by name" do
+      @campfire.find_room_by_name("Just Fishin").class.should == Tinder::Room
+    end
+  
+  end
+
+  describe "when the room is not full" do
+  
+    before do
+      @html = File.read(File.dirname(__FILE__) + '/html/normal_lobby.html')
+      @response.stub!(:body).and_return(@html)
+      @campfire = Tinder::Campfire.new 'foobar'
+    end
+  
+    it "should return a room" do
+      @campfire.rooms.should_not be_empty
+    end
+  
+    it "should find a room by name" do
+       @campfire.find_room_by_name("Just Fishin").class.should == Tinder::Room
+     end
+  end
+  
+end

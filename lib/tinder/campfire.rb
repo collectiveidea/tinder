@@ -60,8 +60,10 @@ module Tinder
     # Get an array of all the available rooms
     # TODO: detect rooms that are full (no link)
     def rooms
-      Hpricot(get.body).search("//h2/a").collect do |a|
-        Room.new(self, room_id_from_url(a.attributes['href']), a.inner_html)
+      Hpricot(get.body).search("//div.room").collect do |a|
+        name = a.search("//h2/a").inner_html.strip
+        name = a.search("//h2").inner_html.strip if name.empty?
+        Room.new(self, room_id_from_element(a.attributes['id']), name)
       end
     end
   
@@ -121,6 +123,10 @@ module Tinder
   
     def room_id_from_url(url)
       url.scan(/room\/(\d*)/).to_s
+    end
+    
+    def room_id_from_element(element)
+      element.split("_").last
     end
 
     def url_for(*args)
