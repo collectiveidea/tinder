@@ -1,3 +1,6 @@
+0.1.9
+* Find rooms even when full [Josh owens]
+
 0.1.8
 * Join rooms as a guest
 
