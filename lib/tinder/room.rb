@@ -116,6 +116,11 @@ module Tinder
     def users
       @campfire.users name
     end
+
+    # Get the list of latest files for this room
+    def files(count = 5)
+      (Hpricot(@room.body)/"#file_list"/"li"/"a").to_a[0,count] rescue nil
+    end
     
     # Get and array of the messages that have been posted to the room. Each
     # messages is a hash with:
