@@ -1,6 +1,6 @@
 1.2.0 - 2009-01-28
 * Get the list of available files [Christopher MacGown]
-* Upload files [Joshua Want]
+* Upload files [Joshua Wand]
 * Find rooms even when full [Josh Owens]
 * Join rooms as a guest [Ian Lesperance]
 
