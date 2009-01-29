@@ -119,7 +119,10 @@ module Tinder
 
     # Get the list of latest files for this room
     def files(count = 5)
-      (Hpricot(@room.body)/"#file_list"/"li"/"a").to_a[0,count] rescue nil
+      join
+      (Hpricot(@room.body)/"#file_list li a").to_a[0,count].map do |link|
+        @campfire.send :url_for, link.attributes['href'][1..-1], :only_path => false
+      end
     end
     
     # Get and array of the messages that have been posted to the room. Each
