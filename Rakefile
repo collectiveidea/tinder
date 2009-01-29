@@ -28,6 +28,7 @@ hoe = Hoe.new('tinder', ENV['VERSION'] || Tinder::VERSION::STRING) do |p|
   p.changes = p.paragraphs_of('CHANGELOG.txt', 0..1).join("\n\n")
   p.extra_deps << ['activesupport']
   p.extra_deps << ['hpricot']
+  p.extra_deps << ['mime-types']
 end
 
 desc "Run the specs under spec"

@@ -117,14 +117,6 @@ module Tinder
       @campfire.users name
     end
 
-    # Get the list of latest files for this room
-    def files(count = 5)
-      join
-      (Hpricot(@room.body)/"#file_list li a").to_a[0,count].map do |link|
-        @campfire.send :url_for, link.attributes['href'][1..-1], :only_path => false
-      end
-    end
-    
     # Get and array of the messages that have been posted to the room. Each
     # messages is a hash with:
     # * +:person+: the display name of the person that posted the message
@@ -182,18 +174,20 @@ module Tinder
     end
     
     def upload(filename)
-      params = {}
-      file = File.open(filename, "rb")
-      params["upload"] = file
-      params["submit"] = "Upload"
-      mp_post = Multipart::MultipartPost.new(params)
-      file.close
-      
-      res = post("upload.cgi/room/#{@id}/uploads/new", mp_post.query, :multipart => true)
-      
+      File.open(filename, "rb") do |file|
+        params = Multipart::MultipartPost.new({'upload' => file, 'submit' => "Upload"})
+        verify_response post("upload.cgi/room/#{@id}/uploads/new", params.query, :multipart => true), :success
+      end
     end
     
-
+    # Get the list of latest files for this room
+    def files(count = 5)
+      join
+      (Hpricot(@room.body)/"#file_list li a").to_a[0,count].map do |link|
+        @campfire.send :url_for, link.attributes['href'][1..-1], :only_path => false
+      end
+    end
+    
   protected
     
     def messages
