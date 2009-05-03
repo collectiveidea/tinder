@@ -186,3 +186,35 @@ describe "Accessing a room" do
   end
   
 end
+
+describe "Accessing a room's transcript" do
+
+  before do
+    @room = Tinder::Room.new nil, 42
+    @html = File.read(File.dirname(__FILE__) + '/html/transcript.html')
+    @response = mock("response")
+    @response.stub!(:body).and_return(@html)
+    @room.stub!(:get).with("room/42/transcript/2009/05/05").
+        and_return(@response)
+    require 'time'
+    @transcript = @room.transcript(Time.parse("2009-05-05"))
+  end
+
+  it "should return some messages" do
+    @transcript.should_not be_empty
+  end
+
+  describe "the first message" do
+      # This is a timestamp message
+      it "should include a timestamp" do
+        @transcript.first[:timestamp].should == Time.parse("2009-05-05 09:35")
+      end
+  end
+
+  describe "the second message" do
+      it "should include a timestamp" do
+        @transcript.second[:timestamp].should == Time.parse("2009-05-05 09:35")
+      end
+  end
+ 
+end

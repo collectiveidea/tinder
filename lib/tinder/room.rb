@@ -159,16 +159,32 @@ module Tinder
     # Get the transcript for the given date (Returns a hash in the same format as #listen)
     #
     #   room.transcript(room.available_transcripts.first)
-    #   #=> [{:message=>"foobar!", :user_id=>"99999", :person=>"Brandon", :id=>"18659245"}]
+    #   #=> [{:message=>"foobar!",
+    #         :user_id=>"99999",
+    #         :person=>"Brandon",
+    #         :id=>"18659245",
+    #         :timestamp=>=>Tue May 05 07:15:00 -0700 2009}]
     #
-    def transcript(date)
-      (Hpricot(get("room/#{id}/transcript/#{date.to_date.strftime('%Y/%m/%d')}").body) / ".message").collect do |message|
+    # The timestamp slot will typically have a granularity of five minutes.
+    #
+    def transcript(transcript_date)
+      url = "room/#{id}/transcript/#{transcript_date.to_date.strftime('%Y/%m/%d')}"
+      date, time = nil, nil
+      (Hpricot(get(url).body) / ".message").collect do |message|
         person = (message / '.person span').first
         body = (message / '.body div').first
+        if d = (message / '.date span').first
+            date = d.inner_html
+        end
+        if t = (message / '.time div').first
+            time = t.inner_html
+        end
         {:id => message.attributes['id'].scan(/message_(\d+)/).to_s,
           :person => person ? person.inner_html : nil,
           :user_id => message.attributes['class'].scan(/user_(\d+)/).to_s,
-          :message => body ? body.inner_html : nil
+          :message => body ? body.inner_html : nil,
+          # Use the transcript_date to fill in the correct year
+          :timestamp => Time.parse("#{date} #{time}", transcript_date)
         }
       end
     end
