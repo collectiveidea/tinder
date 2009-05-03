@@ -172,6 +172,10 @@ module Tinder
       date, time = nil, nil
       (Hpricot(get(url).body) / ".message").collect do |message|
         person = (message / '.person span').first
+        if !person
+          # No span for enter/leave the room messages
+          person = (message / '.person').first
+        end
         body = (message / '.body div').first
         if d = (message / '.date span').first
             date = d.inner_html

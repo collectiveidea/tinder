@@ -217,4 +217,9 @@ describe "Accessing a room's transcript" do
       end
   end
  
+  describe "when entering the room" do
+      it "a transcript message should include the person who entered" do
+        @transcript.second[:person].should == "Marcel"
+      end
+  end
 end
