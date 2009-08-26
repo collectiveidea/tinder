@@ -13,10 +13,10 @@ module Tinder
     def join(force = false)
       @room = returning(get("room/#{id}")) do |room|
         raise Error, "Could not join room" unless verify_response(room, :success)
-        @membership_key = room.body.scan(/\"membershipKey\": \"([a-z0-9]+)\"/).to_s
-        @user_id = room.body.scan(/\"userID\": (\d+)/).to_s
-        @last_cache_id = room.body.scan(/\"lastCacheID\": (\d+)/).to_s
-        @timestamp = room.body.scan(/\"timestamp\": (\d+)/).to_s
+        @membership_key = room.body.scan(/\"membershipKey\":\s?\"([a-z0-9]+)\"/).to_s
+        @user_id = room.body.scan(/\"userID\":\s?(\d+)/).to_s
+        @last_cache_id = room.body.scan(/\"lastCacheID\":\s?(\d+)/).to_s
+        @timestamp = room.body.scan(/\"timestamp\":\s?(\d+)/).to_s
         @idle_since = Time.now
       end if @room.nil? || force
       ping
