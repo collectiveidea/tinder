@@ -1,3 +1,6 @@
+1.2.1 - 2009-08-27
+* Fixes for listening after campfire updates [Jordan Byron]
+
 1.2.0 - 2009-01-28
 * Get the list of available files [Christopher MacGown]
 * Upload files [Joshua Wand]
