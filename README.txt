@@ -18,24 +18,29 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
   
   See the RDoc for more details.
 
-== Requirements
-
-* Active Support
-  gem install activesupport
-* Hpricot
-  gem install hpricot
-  
 == Installation
 
 Tinder can be installed as a gem or a Rails plugin:
 
   gem install tinder
   
-  script/plugin install http://source.collectiveidea.com/public/tinder/trunk
+  script/plugin install git://github.com/collectiveidea/tinder.git
   
-== Development
+== How to contribute
 
-The source for Tinder is available at http://source.collectiveidea.com/public/tinder/trunk. Development can be followed at http://opensoul.org/tags/tinder.  Contributions are welcome!
+If you find what looks like a bug:
+
+1. Check the GitHub issue tracker to see if anyone else has had the same issue.
+   http://github.com/collectiveidea/tinder/issues/
+2. If you don't see anything, create an issue with information on how to reproduce it.
+
+If you want to contribute an enhancement or a fix:
+
+1. Fork the project on github.
+   http://github.com/collectiveidea/tinder
+2. Make your changes with tests.
+3. Commit the changes without making changes to the Rakefile, VERSION, or any other files that aren't related to your enhancement or fix
+4. Send a pull request.
 
 == ToDo
 
