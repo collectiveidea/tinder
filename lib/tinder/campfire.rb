@@ -153,7 +153,7 @@ module Tinder
   
     def prepare_request(request, options = {})
       returning request do
-        request.add_field 'User-Agent', "Tinder/#{Tinder::VERSION::STRING} (http://tinder.rubyforge.org)"
+        request.add_field 'User-Agent', "Tinder (http://tinder.rubyforge.org)"
         request.add_field 'Cookie', @cookie if @cookie
         request.add_field 'X-Requested-With', 'XMLHttpRequest'
         if options[:ajax]
