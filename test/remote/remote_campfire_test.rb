@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
-require File.dirname(__FILE__) + '/credentials'
+require 'test_helper'
+require 'remote/credentials'
 
 class RemoteCampfireTest < Test::Unit::TestCase
 
