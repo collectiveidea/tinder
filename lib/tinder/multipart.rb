@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'mime/types'
 require 'net/http'
 require 'cgi'
