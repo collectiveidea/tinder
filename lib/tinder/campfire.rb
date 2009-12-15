@@ -1,5 +1,5 @@
 module Tinder
-  
+
   # == Usage
   #
   #   campfire = Tinder::Campfire.new 'mysubdomain'
@@ -35,7 +35,7 @@ module Tinder
       end
       @logged_in = false
     end
-    
+
     # Log in to campfire using your +email+ and +password+
     def login(email, password)
       unless verify_response(post("login", :email_address => email, :password => password), :redirect_to => url_for(:only_path => false))
@@ -45,18 +45,18 @@ module Tinder
       raise SSLRequiredError, "Your account requires SSL" unless verify_response(get, :success)
       @logged_in = true
     end
-    
+
     # Returns true when successfully logged in
     def logged_in?
       @logged_in == true
     end
-  
+
     def logout
       returning verify_response(get("logout"), :redirect) do |result|
         @logged_in = !result
       end
     end
-    
+
     # Get an array of all the available rooms
     # TODO: detect rooms that are full (no link)
     def rooms
@@ -66,7 +66,7 @@ module Tinder
         Room.new(self, room_id_from_element(a.attributes['id']), name)
       end
     end
-  
+
     # Find a campfire room by name
     def find_room_by_name(name)
       rooms.detect {|room| room.name == name }
@@ -78,16 +78,16 @@ module Tinder
 
       Room.new(self, room_id_from_url(res['location'])) if verify_response(res, :redirect)
     end
-    
+
     # Creates and returns a new Room with the given +name+ and optionally a +topic+
     def create_room(name, topic = nil)
       find_room_by_name(name) if verify_response(post("account/create/room?from=lobby", {:room => {:name => name, :topic => topic}}, :ajax => true), :success)
     end
-    
+
     def find_or_create_room_by_name(name)
       find_room_by_name(name) || create_room(name)
     end
-    
+
     # List the users that are currently chatting in any room
     def users(*room_names)
       users = Hpricot(get.body).search("div.room").collect do |room|
@@ -97,7 +97,7 @@ module Tinder
       end
       users.flatten.compact.uniq.sort
     end
-    
+
     # Get the dates of the available transcripts by room
     #
     #   campfire.available_transcripts
@@ -113,18 +113,18 @@ module Tinder
       end
       room ? transcripts[room.to_s] : transcripts
     end
-    
+
     # Is the connection to campfire using ssl?
     def ssl?
       uri.scheme == 'https'
     end
-  
+
   private
-  
+
     def room_id_from_url(url)
       url.scan(/room\/(\d*)/).to_s
     end
-    
+
     def room_id_from_element(element)
       element.split("_").last
     end
@@ -146,11 +146,11 @@ module Tinder
         end
       end
     end
-  
+
     def get(path = nil, options = {})
       perform_request(options) { Net::HTTP::Get.new(url_for(path)) }
     end
-  
+
     def prepare_request(request, options = {})
       returning request do
         request.add_field 'User-Agent', "Tinder (http://tinder.rubyforge.org)"
@@ -166,7 +166,7 @@ module Tinder
         end
       end
     end
-    
+
     def perform_request(options = {}, &block)
       @request = prepare_request(yield, options)
       http = @http.new(uri.host, uri.port)
@@ -176,11 +176,11 @@ module Tinder
         @cookie = response['set-cookie'] if response['set-cookie']
       end
     end
-  
+
     # flatten a nested hash (:room => {:name => 'foobar'} to 'user[name]' => 'foobar')
     def flatten(params)
       params = params.dup
-      params.stringify_keys!.each do |k,v| 
+      params.stringify_keys!.each do |k,v|
         if v.is_a? Hash
           params.delete(k)
           v.each {|subk,v| params["#{k}[#{subk}]"] = v }
@@ -202,6 +202,6 @@ module Tinder
         false
       end
     end
-    
+
   end
 end

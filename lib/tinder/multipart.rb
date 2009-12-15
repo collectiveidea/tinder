@@ -41,7 +41,7 @@ module Multipart #:nodoc:
         @content + "\r\n"
     end
   end
-  
+
   class MultipartPost #:nodoc:
     BOUNDARY = 'campfire-is-awesome'
     HEADER = {"Content-type" => "multipart/form-data, boundary=" + BOUNDARY + " "}

@@ -8,7 +8,7 @@ module Tinder
       @id = id
       @name = name
     end
-    
+
     # Join the room. Pass +true+ to join even if you've already joined.
     def join(force = false)
       @room = returning(get("room/#{id}")) do |room|
@@ -22,7 +22,7 @@ module Tinder
       ping
       true
     end
-    
+
     # Leave a room
     def leave
       returning verify_response(post("room/#{id}/leave"), :redirect) do
@@ -42,7 +42,7 @@ module Tinder
       link = (Hpricot(@room.body)/"#guest_access h4").first
       link.inner_html if link
     end
-    
+
     def guest_access_enabled?
       !guest_url.nil?
     end
@@ -62,7 +62,7 @@ module Tinder
     def topic=(topic)
       topic if verify_response(post("room/#{id}/change_topic", { 'room' => { 'topic' => topic }}, :ajax => true), :success)
     end
-    
+
     # Get the current topic
     def topic
       join
@@ -72,7 +72,7 @@ module Tinder
         h.inner_text.strip
       end
     end
-    
+
     # Lock the room to prevent new users from entering and to disable logging
     def lock
       verify_response(post("room/#{id}/lock", {}, :ajax => true), :success)
@@ -99,19 +99,19 @@ module Tinder
         :message => message,
         :t => Time.now.to_i
       }.merge(options)
-      
+
       post_options.delete(:paste) unless post_options[:paste]
       response = post("room/#{id}/speak", post_options, :ajax => true)
-        
+
       if verify_response(response, :success)
-        message 
+        message
       end
     end
 
     def paste(message)
       speak message, :paste => true
     end
-    
+
     # Get the list of users currently chatting for this room
     def users
       @campfire.users name
@@ -150,12 +150,12 @@ module Tinder
         self.messages
       end
     end
-    
+
     # Get the dates for the available transcripts for this room
     def available_transcripts
       @campfire.available_transcripts(id)
     end
-    
+
     # Get the transcript for the given date (Returns a hash in the same format as #listen)
     #
     #   room.transcript(room.available_transcripts.first)
@@ -192,14 +192,14 @@ module Tinder
         }
       end
     end
-    
+
     def upload(filename)
       File.open(filename, "rb") do |file|
         params = Multipart::MultipartPost.new({'upload' => file, 'submit' => "Upload"})
         verify_response post("upload.cgi/room/#{@id}/uploads/new", params.query, :multipart => true), :success
       end
     end
-    
+
     # Get the list of latest files for this room
     def files(count = 5)
       join
@@ -207,16 +207,16 @@ module Tinder
         @campfire.send :url_for, link.attributes['href'][1..-1], :only_path => false
       end
     end
-    
+
   protected
-    
+
     def messages
       returning [] do |messages|
         response = post("poll.fcgi", {:l => @last_cache_id, :m => @membership_key,
           :s => @timestamp, :t => "#{Time.now.to_i}000"}, :ajax => true)
         if response.body.length > 1
           lines = response.body.split("\r\n")
-          
+
           if lines.length > 0
             @last_cache_id = lines.pop.scan(/chat.poller.lastCacheID = (\d+)/).to_s
             lines.each do |msg|
@@ -235,7 +235,7 @@ module Tinder
         end
       end
     end
-  
+
     [:post, :get, :verify_response].each do |method|
       define_method method do |*args|
         @campfire.send method, *args
