@@ -12,6 +12,8 @@ module Tinder
   #   room = campfire.find_room_by_guest_hash 'abc123', 'John Doe'
   #   room.speak 'Hello world!'
   class Campfire
+    HOST = "campfirenow.com"
+
     attr_reader :subdomain, :uri
 
     # Create a new connection to the campfire account with the given +subdomain+.
@@ -26,7 +28,7 @@ module Tinder
       options = { :ssl => false }.merge(options)
       @cookie = nil
       @subdomain = subdomain
-      @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.campfirenow.com")
+      @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       if options[:proxy]
         uri = URI.parse(options[:proxy])
         @http = Net::HTTP::Proxy(uri.host, uri.port, uri.user, uri.password)
