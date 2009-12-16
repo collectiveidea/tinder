@@ -9,7 +9,6 @@ begin
     gem.homepage = 'http://github.com/collectiveidea/tinder'
     gem.rubyforge_project = "tinder"
     gem.add_dependency "activesupport"
-    gem.add_dependency "hpricot"
     gem.add_dependency "mime-types"
     gem.add_development_dependency "rspec"
   end
