@@ -47,13 +47,13 @@ module Tinder
 
     # Change the name of the room
     def name=(name)
-      raise NotImplementedError
+      connection.post("/room/#{@id}.json", :body => { :room => { :name => name } })
     end
     alias_method :rename, :name=
 
     # Change the topic
     def topic=(topic)
-      raise NotImplementedError
+      connection.post("/room/#{@id}.json", :body => { :room => { :topic => name } })
     end
 
     # Get the current topic
