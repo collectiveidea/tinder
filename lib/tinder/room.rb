@@ -86,7 +86,7 @@ module Tinder
     end
 
     def paste(message)
-      send_message(message, 'PasteMassage')
+      send_message(message, 'PasteMessage')
     end
 
     # Get the list of users currently chatting for this room
