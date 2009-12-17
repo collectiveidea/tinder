@@ -2,8 +2,7 @@ require 'spec_helper'
 
 describe Tinder::Room do
   before do
-    @campfire = Tinder::Campfire.new('test')
-    @room = Tinder::Room.new(@campfire, 'id' => 80749)
+    @room = Tinder::Room.new(Tinder::Connection.new('test'), 'id' => 80749)
   end
   
   describe "join" do

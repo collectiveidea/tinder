@@ -12,9 +12,7 @@ module Tinder
   #   room = campfire.find_room_by_guest_hash 'abc123', 'John Doe'
   #   room.speak 'Hello world!'
   class Campfire
-    HOST = "campfirenow.com"
-
-    attr_reader :connection, :subdomain, :uri
+    attr_reader :connection
 
     # Create a new connection to the campfire account with the given +subdomain+.
     #
@@ -25,18 +23,7 @@ module Tinder
     #
     #   c = Tinder::Campfire.new("mysubdomain", :ssl => true)
     def initialize(subdomain, options = {})
-      options = { :ssl => false }.merge(options)
-      @connection = Connection.new
-      @cookie = nil
-      @subdomain = subdomain
-      @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
-      connection.base_uri @uri.to_s
-      if options[:proxy]
-        uri = URI.parse(options[:proxy])
-        @http = Net::HTTP::Proxy(uri.host, uri.port, uri.user, uri.password)
-      else
-        @http = Net::HTTP
-      end
+      @connection = Connection.new(subdomain, options)
       @logged_in = false
     end
 
@@ -60,7 +47,7 @@ module Tinder
     # TODO: detect rooms that are full (no link)
     def rooms
       connection.get('/rooms.json')['rooms'].map do |room|
-        Room.new(self, room)
+        Room.new(connection, room)
       end
     end
 
@@ -96,11 +83,6 @@ module Tinder
     #
     def available_transcripts(room = nil)
       raise NotImplementedError
-    end
-
-    # Is the connection to campfire using ssl?
-    def ssl?
-      uri.scheme == 'https'
     end
   end
 end

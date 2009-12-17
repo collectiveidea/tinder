@@ -3,8 +3,8 @@ module Tinder
   class Room
     attr_reader :id, :name
 
-    def initialize(campfire, attributes = {})
-      @campfire = campfire
+    def initialize(connection, attributes = {})
+      @connection = connection
       @id = attributes['id']
       @name = attributes['name']
       @loaded = false
@@ -28,7 +28,7 @@ module Tinder
     # Get the url for guest access
     def guest_url
       if guest_access_enabled?
-        "http://#{@campfire.subdomain}.campfirenow.com/#{guest_invite_code}"
+        "http://#{@connection.subdomain}.#{Connection::HOST}/#{guest_invite_code}"
       else
         nil
       end
@@ -121,7 +121,7 @@ module Tinder
       require 'yajl/http_stream'
 
       auth = connection.default_options[:basic_auth]
-      url = URI.parse("http://#{auth[:username]}:#{auth[:password]}@streaming.#{Campfire::HOST}/room/#{@id}/live.json")
+      url = URI.parse("http://#{auth[:username]}:#{auth[:password]}@streaming.#{Connection::HOST}/room/#{@id}/live.json")
       Yajl::HttpStream.get(url) do |message|
         { :id => message['id'],
           :user_id => message['user_id'],
@@ -203,7 +203,7 @@ module Tinder
       end
 
       def connection
-        @campfire.connection
+        @connection
       end
   end
 end
