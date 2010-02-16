@@ -5,7 +5,8 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
 == Usage
 
   campfire = Tinder::Campfire.new 'mysubdomain'
-  campfire.login 'myemail@example.com', 'mypassword'
+  # new uses API token, something similar to: 546884b3d8fee4d80665g561caf7h9f3ea7b999e
+  campfire.login '546884b3d8fee4d80665g561caf7h9f3ea7b999e', ''
 
   room = campfire.create_room 'New Room', 'My new campfire room to test tinder'
   room.rename 'New Room Name'
