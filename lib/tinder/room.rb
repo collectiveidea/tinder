@@ -20,18 +20,9 @@ module Tinder
       post 'leave'
     end
 
-    # Toggle guest access on or off
-    def toggle_guest_access
-      raise NotImplementedError
-    end
-
     # Get the url for guest access
     def guest_url
-      if guest_access_enabled?
-        "http://#{@connection.subdomain}.#{Connection::HOST}/#{guest_invite_code}"
-      else
-        nil
-      end
+      "#{@connection.uri}/#{guest_invite_code}" if guest_access_enabled?
     end
 
     def guest_access_enabled?
