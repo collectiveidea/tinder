@@ -1,10 +1,3 @@
-require 'rubygems'
-require 'active_support'
-require 'uri'
-require 'net/http'
-require 'net/https'
-require 'open-uri'
-
 require 'tinder/connection'
 require 'tinder/multipart'
 require 'tinder/campfire'
