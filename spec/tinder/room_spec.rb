@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe Tinder::Room do
   before do
-    @room = Tinder::Room.new(Tinder::Connection.new('test'), 'id' => 80749)
+    @room = Tinder::Room.new(Tinder::Connection.new('test', :token => 'mytoken'), 'id' => 80749)
   end
   
   describe "join" do
-    FakeWeb.register_uri(:post, "http://test.campfirenow.com/room/80749/join.json", :status => '200')
+    FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/join.json", :status => '200')
     
     it "should post to join url" do
       @room.join
@@ -15,7 +15,7 @@ describe Tinder::Room do
 
   describe "leave" do
     before do
-      FakeWeb.register_uri(:post, "http://test.campfirenow.com/room/80749/leave.json", :status => '200')
+      FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/leave.json", :status => '200')
     end
     
     it "should post to leave url" do
@@ -25,7 +25,7 @@ describe Tinder::Room do
   
   describe "lock" do
     before do
-      FakeWeb.register_uri(:post, "http://test.campfirenow.com/room/80749/lock.json", :status => '200')
+      FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/lock.json", :status => '200')
     end
     
     it "should post to lock url" do
@@ -35,7 +35,7 @@ describe Tinder::Room do
   
   describe "unlock" do
     before do
-      FakeWeb.register_uri(:post, "http://test.campfirenow.com/room/80749/unlock.json", :status => '200')
+      FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/unlock.json", :status => '200')
     end
     
     it "should post to unlock url" do

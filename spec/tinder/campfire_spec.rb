@@ -2,27 +2,12 @@ require 'spec_helper'
 
 describe Tinder::Campfire do
   before do
-    @campfire = Tinder::Campfire.new('test')
-  end
-  
-  describe "authentication" do
-    it "should raise an exception with bad credentials" do
-      FakeWeb.register_uri(:get, "http://test.campfirenow.com/rooms.json",
-        :body => "HTTP Basic: Access denied.", :status => ["401", "Unauthorized"])
-      @campfire.rooms
-    end
-    
-    it "should use basic auth for credentials" do
-      FakeWeb.register_uri(:get, "http://user:password@test.campfirenow.com/rooms.json",
-        :body => fixture('rooms.json'), :content_type => "application/json")
-      @campfire.login 'user', 'password'
-      @campfire.rooms
-    end
+    @campfire = Tinder::Campfire.new('test', :token => 'mytoken')
   end
   
   describe "rooms" do
     before do
-      FakeWeb.register_uri(:get, "http://test.campfirenow.com/rooms.json",
+      FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/rooms.json",
         :body => fixture('rooms.json'), :content_type => "application/json")
     end
     

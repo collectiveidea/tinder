@@ -2,8 +2,7 @@ module Tinder
 
   # == Usage
   #
-  #   campfire = Tinder::Campfire.new 'mysubdomain'
-  #   campfire.login 'myemail@example.com', 'mypassword'
+  #   campfire = Tinder::Campfire.new 'mysubdomain', :token => 'xyz'
   #
   #   room = campfire.create_room 'New Room', 'My new campfire room to test tinder'
   #   room.speak 'Hello world!'
@@ -25,12 +24,6 @@ module Tinder
     def initialize(subdomain, options = {})
       @connection = Connection.new(subdomain, options)
       @logged_in = false
-    end
-
-    # Log in to campfire using your +email+ and +password+
-    def login(username, password)
-      connection.basic_auth(username, password)
-      @logged_in = true
     end
 
     # Returns true when successfully logged in

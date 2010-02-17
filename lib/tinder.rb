@@ -6,4 +6,5 @@ require 'tinder/room'
 module Tinder
   class Error < StandardError; end
   class SSLRequiredError < Error; end
+  class AuthenticationFailed < Error; end
 end

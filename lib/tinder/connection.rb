@@ -4,27 +4,39 @@ module Tinder
   class Connection
     HOST = "campfirenow.com"
 
-    attr_reader :subdomain, :uri
+    attr_reader :subdomain, :uri, :options
     
     def initialize(subdomain, options = {})
       @subdomain = subdomain
-      options = { :ssl => false }.merge(options)
-      @uri = URI.parse("#{options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
-
-      if options[:proxy]
-        uri = URI.parse(options[:proxy])
-        @http = Net::HTTP::Proxy(uri.host, uri.port, uri.user, uri.password)
-      else
-        @http = Net::HTTP
-      end
+      @options = { :ssl => false }.merge(options)
+      @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
+      @token = options[:token]
+      
       
       class << self
         include HTTParty
-
+        extend HTTPartyExtensions
+        
         headers 'Content-Type' => 'application/json'
       end
       
       base_uri @uri.to_s
+      basic_auth token, 'X'
+    end
+    
+    module HTTPartyExtensions
+      def perform_request(http_method, path, options) #:nodoc:
+        response = super
+        raise AuthenticationFailed if response.code == 401
+        response
+      end
+    end
+    
+    def token
+      @token ||= begin
+        self.basic_auth(options[:username], options[:password])
+        self.get('/users/me.json')['user']['api_auth_token']
+      end
     end
 
     def metaclass
