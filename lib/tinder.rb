@@ -1,3 +1,5 @@
+require 'active_support/json'
+
 require 'tinder/connection'
 require 'tinder/multipart'
 require 'tinder/campfire'
