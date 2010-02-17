@@ -38,13 +38,13 @@ module Tinder
 
     # Change the name of the room
     def name=(name)
-      connection.put("/room/#{@id}.json", :body => { :room => { :name => name } })
+      connection.put("/room/#{@id}.json", :body => {:room => {:name => name}}.to_json)
     end
     alias_method :rename, :name=
 
     # Change the topic
     def topic=(topic)
-      connection.put("/room/#{@id}.json", :body => { :room => { :topic => name } })
+      connection.put("/room/#{@id}.json", :body => {:room => {:topic => topic}}.to_json)
     end
 
     # Get the current topic
