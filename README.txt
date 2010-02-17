@@ -1,18 +1,17 @@
 = Tinder - get the Campfire started
 
-Tinder is a library for interfacing with Campfire, the chat application from 37Signals, allowing you to programatically manage and speak/listen in chat rooms.  As of December 2009, thanks to initial work from Joshua Peek at 37signals, it now makes use of the official Campfire API (described at: http://developer.37signals.com/campfire/).
+Tinder is a library for interfacing with Campfire, the chat application from 37Signals, allowing you to programmatically manage and speak/listen in chat rooms.  As of December 2009, thanks to initial work from Joshua Peek at 37signals, it now makes use of the official Campfire API (described at: http://developer.37signals.com/campfire/).
 
 == Usage
 
-  campfire = Tinder::Campfire.new 'mysubdomain'
-  # new uses API token, something similar to: 546884b3d8fee4d80665g561caf7h9f3ea7b999e
-  campfire.login '546884b3d8fee4d80665g561caf7h9f3ea7b999e', ''
-
-  room = campfire.create_room 'New Room', 'My new campfire room to test tinder'
-  room.rename 'New Room Name'
+  campfire = Tinder::Campfire.new 'mysubdomain', :token => '546884b3d8fee4d80665g561caf7h9f3ea7b999e'
+  # or you can still use username/password and Tinder will look up your token
+  # campfire = Tinder::Campfire.new 'mysubdomain', :username => 'user', :password => 'pass'
+  
+  room = campfire.rooms.first
+  room.rename 'New Room Names'
   room.speak 'Hello world!'
   room.paste "my pasted\ncode"
-  room.destroy
 
   room = campfire.find_room_by_guest_hash 'abc123', 'John Doe'
   room.speak 'Hello world!'
