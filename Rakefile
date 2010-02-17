@@ -2,8 +2,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "tinder"
-    gem.summary = "An (unofficial) Campfire API"
-    gem.description = "An API for interfacing with Campfire, the 37Signals chat application."
+    gem.summary = "Ruby wrapper for the Campfire API"
+    gem.description = "A Ruby API for interfacing with Campfire, the 37Signals chat application."
     gem.authors = ['Brandon Keepers']
     gem.email = 'brandon@opensoul.org'
     gem.homepage = 'http://github.com/collectiveidea/tinder'
