@@ -23,17 +23,6 @@ module Tinder
     #   c = Tinder::Campfire.new("mysubdomain", :ssl => true)
     def initialize(subdomain, options = {})
       @connection = Connection.new(subdomain, options)
-      @logged_in = false
-    end
-
-    # Returns true when successfully logged in
-    def logged_in?
-      @logged_in == true
-    end
-
-    def logout
-      connection.default_options.delete(:basic_auth)
-      @logged_in = false
     end
 
     # Get an array of all the available rooms
