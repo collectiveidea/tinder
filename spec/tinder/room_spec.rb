@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Tinder::Room do
   before do
+    FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/room/80749.json",
+      :body => fixture('rooms/show.json'), :content_type => "application/json")
     @room = Tinder::Room.new(Tinder::Connection.new('test', :token => 'mytoken'), 'id' => 80749)
   end
   
@@ -40,6 +42,34 @@ describe Tinder::Room do
     
     it "should post to unlock url" do
       @room.unlock
+    end
+  end
+  
+  describe "guest_url" do
+    it "should use guest_invite_code if active" do
+      @room.stub!(:guest_access_enabled? => true, :guest_invite_code => '123')
+      @room.guest_url.should == "http://test.campfirenow.com/123"
+    end
+    
+    it "should return nil when guest access is not enabled" do
+      @room.stub!(:guest_access_enabled?).and_return(false)
+      @room.guest_url.should be_nil
+    end
+  end
+  
+  it "should set guest_invite_code" do
+    @room.guest_invite_code.should == "90cf7"
+  end
+  
+  it "should set guest_access_enabled?" do
+    @room.guest_access_enabled?.should be_true
+  end
+  
+  describe "name=" do
+    it "should put to update the room" do
+      FakeWeb.register_uri(:put, "http://mytoken:X@test.campfirenow.com/room/80749.json",
+        :status => '200')
+      @room.name = "Foo"
     end
   end
   

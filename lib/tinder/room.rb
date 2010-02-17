@@ -38,13 +38,13 @@ module Tinder
 
     # Change the name of the room
     def name=(name)
-      connection.post("/room/#{@id}.json", :body => { :room => { :name => name } })
+      connection.put("/room/#{@id}.json", :body => { :room => { :name => name } })
     end
     alias_method :rename, :name=
 
     # Change the topic
     def topic=(topic)
-      connection.post("/room/#{@id}.json", :body => { :room => { :topic => name } })
+      connection.put("/room/#{@id}.json", :body => { :room => { :topic => name } })
     end
 
     # Get the current topic
@@ -170,8 +170,8 @@ module Tinder
         @name = attributes['name']
         @topic = attributes['topic']
         @full = attributes['full']
-        @open_to_guests = attributes['open-to-guests']
-        @active_token_value = attributes['active-token-value']
+        @open_to_guests = attributes['open_to_guests']
+        @active_token_value = attributes['active_token_value']
         @users = attributes['users'].map { |u| u['name'] }
 
         @loaded = true
