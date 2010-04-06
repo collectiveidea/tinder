@@ -58,6 +58,11 @@ module Tinder
       rooms.map(&:users).flatten.compact.uniq.sort
     end
 
+    # get the user info of the current user
+    def me
+      connection.get("/users/me.json")["user"]
+    end
+    
     # Get the dates of the available transcripts by room
     #
     #   campfire.available_transcripts
