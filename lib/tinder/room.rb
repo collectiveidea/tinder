@@ -103,6 +103,9 @@ module Tinder
     #     room.speak "Go away!" if m[:body] =~ /Java/i
     #   end
     #
+    # Note that there is a bug in ruby versions before 1.8.7-p249 that prevents listen
+    # from working, as Yajl::HttpStream.get returns immediately. See
+    # http://github.com/brianmario/yajl-ruby/issues/cl
     def listen
       raise "no block provided" unless block_given?
       
