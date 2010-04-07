@@ -75,12 +75,17 @@ describe Tinder::Room do
   
   describe "listen" do
     before do
-      require 'yajl/http_stream'
+      require 'twitter/json_stream'
+      # Get EventMachine out of the way. We could be using em-spec, but seems like overkill for testing one method.
+      module EventMachine; def self.run; yield end end
+      @stream = mock(Twitter::JSONStream)
+      @stream.stub!(:each_item)
     end
     
     it "should get from the streaming url" do
-      Yajl::HttpStream.should_receive(:get).
-        with("http://mytoken:X@streaming.campfirenow.com/room/80749/live.json", anything)
+      Twitter::JSONStream.should_receive(:connect).
+        with({:host=>"streaming.campfirenow.com", :path=>"/room/80749/live.json", :auth=>"mytoken:X", :timeout=>2}).
+        and_return(@stream)
       @room.listen { }
     end
     

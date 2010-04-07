@@ -102,20 +102,24 @@ module Tinder
     #   room.listen do |m|
     #     room.speak "Go away!" if m[:body] =~ /Java/i
     #   end
-    #
-    # Note that there is a bug in ruby versions before 1.8.7-p249 that prevents listen
-    # from working, as Yajl::HttpStream.get returns immediately. See
-    # http://github.com/brianmario/yajl-ruby/issues/cl
     def listen
       raise "no block provided" unless block_given?
       
-      require 'yajl/http_stream'
+      require 'twitter/json_stream'
       
       join # you have to be in the room to listen
       auth = connection.default_options[:basic_auth]
-      url = "http://#{auth[:username]}:#{auth[:password]}@streaming.#{Connection::HOST}/room/#{@id}/live.json"
-      Yajl::HttpStream.get(url, :symbolize_keys => true) do |message|
-        yield(message)
+      options = {
+        :host => "streaming.#{Connection::HOST}",
+        :path => "/room/#{@id}/live.json",
+        :auth => "#{auth[:username]}:#{auth[:password]}",
+        :timeout => 2
+      }
+      EventMachine::run do
+        stream = Twitter::JSONStream.connect(options)
+        stream.each_item do |message|
+          yield(JSON.parse(message).symbolize_keys)
+        end
       end
     end
 
