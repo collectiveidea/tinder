@@ -73,4 +73,21 @@ describe Tinder::Room do
     end
   end
   
+  describe "listen" do
+    before do
+      require 'yajl/http_stream'
+    end
+    
+    it "should get from the streaming url" do
+      Yajl::HttpStream.should_receive(:get).
+        with("http://mytoken:X@streaming.campfirenow.com/room/80749/live.json", anything)
+      @room.listen { }
+    end
+    
+    it "should raise an exception if no block is given" do
+      lambda {
+        @room.listen
+      }.should raise_error("no block provided")
+    end
+  end
 end

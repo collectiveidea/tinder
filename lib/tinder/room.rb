@@ -90,33 +90,29 @@ module Tinder
       @users
     end
 
-    # Get and array of the messages that have been posted to the room. Each
-    # messages is a hash with:
-    # * +:person+: the display name of the person that posted the message
-    # * +:message+: the body of the message
+    # Listen for new messages in the room, yielding them to the provided block as they arrive.
+    # Each message is a hash with:
+    # * +:body+: the body of the message
     # * +:user_id+: Campfire user id
     # * +:id+: Campfire message id
-    #
-    #   room.listen
-    #   #=> [{:person=>"Brandon", :message=>"I'm getting very sleepy", :user_id=>"148583", :id=>"16434003"}]
-    #
-    # Called without a block, listen will return an array of messages that have been
-    # posted since you joined. listen also takes an optional block, which then polls
-    # for new messages every 5 seconds and calls the block for each message.
+    # * +:type+: Campfire message type
+    # * +:room_id+: Campfire room id
+    # * +:created_at+: message timestamp
     #
     #   room.listen do |m|
-    #     room.speak "#{m[:person]}, Go away!" if m[:message] =~ /Java/i
+    #     room.speak "Go away!" if m[:body] =~ /Java/i
     #   end
     #
-    def listen(interval = 5)
+    def listen
+      raise "no block provided" unless block_given?
+      
       require 'yajl/http_stream'
-
+      
+      join # you have to be in the room to listen
       auth = connection.default_options[:basic_auth]
-      url = URI.parse("http://#{auth[:username]}:#{auth[:password]}@streaming.#{Connection::HOST}/room/#{@id}/live.json")
-      Yajl::HttpStream.get(url) do |message|
-        { :id => message['id'],
-          :user_id => message['user_id'],
-          :message => message['body'] }
+      url = "http://#{auth[:username]}:#{auth[:password]}@streaming.#{Connection::HOST}/room/#{@id}/live.json"
+      Yajl::HttpStream.get(url, :symbolize_keys => true) do |message|
+        yield(message)
       end
     end
 
