@@ -111,7 +111,7 @@ module Tinder
       auth = connection.default_options[:basic_auth]
       options = {
         :host => "streaming.#{Connection::HOST}",
-        :path => "/room/#{@id}/live.json",
+        :path => room_url_for(:live),
         :auth => "#{auth[:username]}:#{auth[:password]}",
         :timeout => 2
       }
@@ -152,13 +152,13 @@ module Tinder
     def upload(filename)
       File.open(filename, "rb") do |file|
         params = Multipart::MultipartPost.new('upload' => file)
-        connection.post("/room/#{@id}/uploads.json", :body => params.query)
+        post(:uploads, :body => params.query)
       end
     end
 
     # Get the list of latest files for this room
     def files(count = 5)
-      connection.get(room_url_for(:uploads))['uploads'].map { |u| u['full_url'] }
+      get(:uploads)['uploads'].map { |u| u['full_url'] }
     end
 
     protected
