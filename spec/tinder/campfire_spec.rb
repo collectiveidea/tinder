@@ -26,11 +26,11 @@ describe Tinder::Campfire do
   describe "me" do
     before do
       FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/users/me.json",
-        :body => fixture('me.json'), :content_type => "application/json")
+        :body => fixture('users/me.json'), :content_type => "application/json")
     end
     
     it "should return the current user's information" do
-      @campfire.me["name"].should == "Joe"
+      @campfire.me["name"].should == "John Doe"
     end
   end
 end
