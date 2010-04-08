@@ -1,5 +1,19 @@
 require 'httparty'
 
+# override HTTParty's json parser to return a HashWithIndifferentAccess
+module HTTParty
+  class Parser
+    protected
+    def json
+      result = Crack::JSON.parse(body)
+      if result.is_a?(Hash)
+        result = HashWithIndifferentAccess.new(result)
+      end
+      result
+    end
+  end
+end
+
 module Tinder
   class Connection
     HOST = "campfirenow.com"
