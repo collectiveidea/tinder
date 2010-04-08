@@ -180,7 +180,7 @@ module Tinder
         @loaded = true
       end
 
-      def send_message(message, type = 'Textmessage')
+      def send_message(message, type = 'TextMessage')
         post 'speak', :body => {:message => {:body => message, :type => type}}.to_json
       end
 
