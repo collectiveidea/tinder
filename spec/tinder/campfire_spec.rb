@@ -23,6 +23,23 @@ describe Tinder::Campfire do
     end
   end
   
+  describe "users" do
+    before do
+      FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/rooms.json",
+        :body => fixture('rooms.json'), :content_type => "application/json")
+      [80749, 80751].each do |id|
+        FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/room/#{id}.json",
+        :body => fixture("rooms/room#{id}.json"), :content_type => "application/json")
+      end
+    end
+    
+    it "should return a sorted list of users in all rooms" do
+      @campfire.users.length.should == 2
+      @campfire.users.first[:name].should == "Jane Doe"
+      @campfire.users.last[:name].should == "John Doe"
+    end
+  end
+  
   describe "me" do
     before do
       FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/users/me.json",

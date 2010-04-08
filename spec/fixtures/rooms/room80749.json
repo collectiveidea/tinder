@@ -1,0 +1,21 @@
+{
+    "room": {
+        "full": false,
+        "name": "Room 1",
+        "created_at": "2007/03/16 18:03:21 +0000",
+        "updated_at": "2007/03/16 18:03:21 +0000",
+        "users": [{
+            "type": "Member",
+            "created_at": "2006/12/07 21:20:39 +0000",
+            "email_address": "jane@example.com",
+            "admin": true,
+            "id": 1,
+            "name": "Jane Doe"
+        }],
+        "topic": "Testing",
+        "active_token_value": "90cf7",
+        "id": 80749,
+        "open_to_guests": true,
+        "membership_limit": 4
+    }
+}

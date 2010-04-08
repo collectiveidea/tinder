@@ -90,14 +90,33 @@ module Tinder
       @users
     end
 
+    # return the user with the given id; if it isn't in our room cache, do a request to get it
+    def user(id)
+      if id
+        user = users.detect {|u| u[:id] == id }
+        unless user
+          user_data = connection.get("/users/#{id}.json")
+          user = user_data && user_data[:user]
+        end
+        user[:created_at] = Time.parse(user[:created_at])        
+        user
+      end
+    end
+    
     # Listen for new messages in the room, yielding them to the provided block as they arrive.
     # Each message is a hash with:
     # * +:body+: the body of the message
-    # * +:user_id+: Campfire user id
+    # * +:user+: Campfire user, which is itself a hash, of:
+    #   * +:id+: User id
+    #   * +:name+: User name
+    #   * +:email_address+: Email address
+    #   * +:admin+: Boolean admin flag
+    #   * +:created_at+: User creation timestamp
+    #   * +:type+: User type (e.g. Member)
     # * +:id+: Campfire message id
     # * +:type+: Campfire message type
     # * +:room_id+: Campfire room id
-    # * +:created_at+: message timestamp
+    # * +:created_at+: Message creation timestamp
     #
     #   room.listen do |m|
     #     room.speak "Go away!" if m[:body] =~ /Java/i
@@ -118,7 +137,10 @@ module Tinder
       EventMachine::run do
         stream = Twitter::JSONStream.connect(options)
         stream.each_item do |message|
-          yield(JSON.parse(message).symbolize_keys)
+          message = HashWithIndifferentAccess.new(JSON.parse(message))
+          message[:user] = user(message.delete(:user_id))
+          message[:created_at] = Time.parse(message[:created_at])
+          yield(message)
         end
       end
     end
@@ -175,7 +197,7 @@ module Tinder
         @full = attributes['full']
         @open_to_guests = attributes['open_to_guests']
         @active_token_value = attributes['active_token_value']
-        @users = attributes['users'].map { |u| u['name'] }
+        @users = attributes['users']
 
         @loaded = true
       end
