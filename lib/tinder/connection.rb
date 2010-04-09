@@ -22,7 +22,7 @@ module Tinder
     
     def initialize(subdomain, options = {})
       @subdomain = subdomain
-      @options = { :ssl => false }.merge(options)
+      @options = { :ssl => false, :proxy => ENV['HTTP_PROXY'] }.merge(options)
       @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       @token = options[:token]
       
@@ -34,6 +34,10 @@ module Tinder
         headers 'Content-Type' => 'application/json'
       end
       
+      if @options[:proxy]
+        proxy_uri = URI.parse(@options[:proxy])
+        http_proxy proxy_uri.host, proxy_uri.port
+      end
       base_uri @uri.to_s
       basic_auth token, 'X'
     end
