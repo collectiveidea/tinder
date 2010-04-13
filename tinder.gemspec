@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brandon Keepers"]
-  s.date = %q{2009-12-17}
-  s.description = %q{An API for interfacing with Campfire, the 37Signals chat application.}
+  s.date = %q{2010-04-13}
+  s.description = %q{A Ruby API for interfacing with Campfire, the 37Signals chat application.}
   s.email = %q{brandon@opensoul.org}
   s.extra_rdoc_files = [
     "README.txt"
@@ -30,15 +30,17 @@ Gem::Specification.new do |s|
      "lib/tinder/room.rb",
      "site/index.html",
      "site/stylesheets/style.css",
-     "spec/campfire_spec.rb",
-     "spec/html/full_lobby.html",
-     "spec/html/normal_lobby.html",
-     "spec/html/transcript.html",
+     "spec/fixtures/rooms.json",
+     "spec/fixtures/rooms/room80749.json",
+     "spec/fixtures/rooms/room80751.json",
+     "spec/fixtures/rooms/show.json",
+     "spec/fixtures/users/me.json",
+     "spec/room_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
-     "test/remote/credentials.rb.example",
-     "test/remote/remote_campfire_test.rb",
-     "test/test_helper.rb",
+     "spec/tinder/campfire_spec.rb",
+     "spec/tinder/connection_spec.rb",
+     "spec/tinder/room_spec.rb",
      "tinder.gemspec"
   ]
   s.homepage = %q{http://github.com/collectiveidea/tinder}
@@ -46,12 +48,13 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{tinder}
   s.rubygems_version = %q{1.3.5}
-  s.summary = %q{An (unofficial) Campfire API}
+  s.summary = %q{Ruby wrapper for the Campfire API}
   s.test_files = [
-    "spec/campfire_spec.rb",
+    "spec/room_spec.rb",
      "spec/spec_helper.rb",
-     "test/remote/remote_campfire_test.rb",
-     "test/test_helper.rb"
+     "spec/tinder/campfire_spec.rb",
+     "spec/tinder/connection_spec.rb",
+     "spec/tinder/room_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
@@ -62,18 +65,27 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_runtime_dependency(%q<httparty>, [">= 0"])
       s.add_runtime_dependency(%q<mime-types>, [">= 0"])
+      s.add_runtime_dependency(%q<twitter-stream>, [">= 0"])
+      s.add_runtime_dependency(%q<eventmachine>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<fakeweb>, [">= 0"])
     else
       s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<httparty>, [">= 0"])
       s.add_dependency(%q<mime-types>, [">= 0"])
+      s.add_dependency(%q<twitter-stream>, [">= 0"])
+      s.add_dependency(%q<eventmachine>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<fakeweb>, [">= 0"])
     end
   else
     s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<httparty>, [">= 0"])
     s.add_dependency(%q<mime-types>, [">= 0"])
+    s.add_dependency(%q<twitter-stream>, [">= 0"])
+    s.add_dependency(%q<eventmachine>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<fakeweb>, [">= 0"])
   end
 end
 
