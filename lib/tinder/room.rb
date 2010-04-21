@@ -123,16 +123,18 @@ module Tinder
     #   end
     def listen
       raise "no block provided" unless block_given?
-      
+
+      join # you have to be in the room to listen
+
       require 'twitter/json_stream'
       
-      join # you have to be in the room to listen
       auth = connection.default_options[:basic_auth]
       options = {
         :host => "streaming.#{Connection::HOST}",
         :path => room_url_for(:live),
         :auth => "#{auth[:username]}:#{auth[:password]}",
-        :timeout => 2
+        :timeout => 2,
+        :ssl => connection.options[:ssl]
       }
       EventMachine::run do
         stream = Twitter::JSONStream.connect(options)
