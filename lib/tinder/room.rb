@@ -121,7 +121,7 @@ module Tinder
     #   room.listen do |m|
     #     room.speak "Go away!" if m[:body] =~ /Java/i
     #   end
-    def listen
+    def listen(options = {})
       raise "no block provided" unless block_given?
 
       join # you have to be in the room to listen
@@ -133,9 +133,9 @@ module Tinder
         :host => "streaming.#{Connection::HOST}",
         :path => room_url_for(:live),
         :auth => "#{auth[:username]}:#{auth[:password]}",
-        :timeout => 2,
+        :timeout => 6,
         :ssl => connection.options[:ssl]
-      }
+      }.merge(options)
       EventMachine::run do
         stream = Twitter::JSONStream.connect(options)
         stream.each_item do |message|
