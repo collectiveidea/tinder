@@ -144,6 +144,8 @@ module Tinder
           message[:created_at] = Time.parse(message[:created_at])
           yield(message)
         end
+        # if we really get disconnected 
+        raise ListenFailed.new("got disconnected from #{@name}!") if !EventMachine::reactor_running?()
       end
     end
 
