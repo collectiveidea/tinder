@@ -1,4 +1,5 @@
 require 'active_support'
+require 'active_support/json'
 
 require 'tinder/connection'
 require 'tinder/multipart'

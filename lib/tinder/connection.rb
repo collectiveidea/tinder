@@ -1,4 +1,5 @@
 require 'httparty'
+require 'active_support/core_ext/hash/indifferent_access'
 
 # override HTTParty's json parser to return a HashWithIndifferentAccess
 module HTTParty
