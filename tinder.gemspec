@@ -5,21 +5,20 @@
 
 Gem::Specification.new do |s|
   s.name = %q{tinder}
-  s.version = "1.3.1"
+  s.version = "1.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brandon Keepers"]
-  s.date = %q{2010-04-13}
+  s.date = %q{2010-05-11}
   s.description = %q{A Ruby API for interfacing with Campfire, the 37Signals chat application.}
   s.email = %q{brandon@opensoul.org}
   s.extra_rdoc_files = [
-    "README.txt"
+    "README.markdown"
   ]
   s.files = [
     ".gitignore",
      "CHANGELOG.txt",
-     "Manifest.txt",
-     "README.txt",
+     "README.markdown",
      "Rakefile",
      "VERSION",
      "init.rb",
@@ -35,7 +34,6 @@ Gem::Specification.new do |s|
      "spec/fixtures/rooms/room80751.json",
      "spec/fixtures/rooms/show.json",
      "spec/fixtures/users/me.json",
-     "spec/room_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
      "spec/tinder/campfire_spec.rb",
@@ -47,11 +45,10 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{tinder}
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Ruby wrapper for the Campfire API}
   s.test_files = [
-    "spec/room_spec.rb",
-     "spec/spec_helper.rb",
+    "spec/spec_helper.rb",
      "spec/tinder/campfire_spec.rb",
      "spec/tinder/connection_spec.rb",
      "spec/tinder/room_spec.rb"
