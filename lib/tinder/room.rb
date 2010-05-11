@@ -63,14 +63,6 @@ module Tinder
       post :unlock
     end
 
-    def ping(force = false)
-      raise NotImplementedError
-    end
-
-    def destroy
-      raise NotImplementedError
-    end
-
     # Post a new message to the chat room
     def speak(message, options = {})
       send_message(message)
@@ -147,11 +139,6 @@ module Tinder
         # if we really get disconnected 
         raise ListenFailed.new("got disconnected from #{@name}!") if !EventMachine.reactor_running?
       end
-    end
-
-    # Get the dates for the available transcripts for this room
-    def available_transcripts
-      raise NotImplementedError
     end
 
     # Get the transcript for the given date (Returns a hash in the same format as #listen)

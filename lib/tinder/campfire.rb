@@ -62,14 +62,5 @@ module Tinder
     def me
       connection.get("/users/me.json")["user"]
     end
-    
-    # Get the dates of the available transcripts by room
-    #
-    #   campfire.available_transcripts
-    #   #=> {"15840" => [#<Date: 4908311/2,0,2299161>, #<Date: 4908285/2,0,2299161>]}
-    #
-    def available_transcripts(room = nil)
-      raise NotImplementedError
-    end
   end
 end
