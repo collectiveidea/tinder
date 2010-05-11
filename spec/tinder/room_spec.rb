@@ -78,13 +78,14 @@ describe Tinder::Room do
       require 'twitter/json_stream'
       # Get EventMachine out of the way. We could be using em-spec, but seems like overkill for testing one method.
       module EventMachine; def self.run; yield end end
+      EventMachine.stub!(:reactor_running?).and_return(true)
       @stream = mock(Twitter::JSONStream)
       @stream.stub!(:each_item)
     end
     
     it "should get from the streaming url" do
       Twitter::JSONStream.should_receive(:connect).
-        with({:host=>"streaming.campfirenow.com", :path=>"/room/80749/live.json", :auth=>"mytoken:X", :timeout=>2}).
+        with({:host=>"streaming.campfirenow.com", :path=>"/room/80749/live.json", :auth=>"mytoken:X", :timeout=>6, :ssl=>false}).
         and_return(@stream)
       @room.listen { }
     end

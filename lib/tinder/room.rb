@@ -145,7 +145,7 @@ module Tinder
           yield(message)
         end
         # if we really get disconnected 
-        raise ListenFailed.new("got disconnected from #{@name}!") if !EventMachine::reactor_running?()
+        raise ListenFailed.new("got disconnected from #{@name}!") if !EventMachine.reactor_running?
       end
     end
 
