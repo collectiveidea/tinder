@@ -18,6 +18,7 @@ module Tinder
     # Leave a room
     def leave
       post 'leave'
+      stop_listening
     end
 
     # Get the url for guest access
@@ -46,7 +47,7 @@ module Tinder
     def topic=(topic)
       update :topic => topic
     end
-    
+
     def update(attrs)
       connection.put("/room/#{@id}.json", :body => {:room => attrs}.to_json)
     end
@@ -94,11 +95,11 @@ module Tinder
           user_data = connection.get("/users/#{id}.json")
           user = user_data && user_data[:user]
         end
-        user[:created_at] = Time.parse(user[:created_at])        
+        user[:created_at] = Time.parse(user[:created_at])
         user
       end
     end
-    
+
     # Listen for new messages in the room, yielding them to the provided block as they arrive.
     # Each message is a hash with:
     # * +:body+: the body of the message
@@ -118,12 +119,12 @@ module Tinder
     #     room.speak "Go away!" if m[:body] =~ /Java/i
     #   end
     def listen(options = {})
-      raise "no block provided" unless block_given?
+      raise ArgumentError, "no block provided" unless block_given?
 
       join # you have to be in the room to listen
 
       require 'twitter/json_stream'
-      
+
       auth = connection.default_options[:basic_auth]
       options = {
         :host => "streaming.#{Connection::HOST}",
@@ -133,16 +134,27 @@ module Tinder
         :ssl => connection.options[:ssl]
       }.merge(options)
       EventMachine::run do
-        stream = Twitter::JSONStream.connect(options)
-        stream.each_item do |message|
+        @stream = Twitter::JSONStream.connect(options)
+        @stream.each_item do |message|
           message = HashWithIndifferentAccess.new(JSON.parse(message))
           message[:user] = user(message.delete(:user_id))
           message[:created_at] = Time.parse(message[:created_at])
           yield(message)
         end
-        # if we really get disconnected 
+        # if we really get disconnected
         raise ListenFailed.new("got disconnected from #{@name}!") if !EventMachine.reactor_running?
       end
+    end
+
+    def listening?
+      @stream != nil
+    end
+
+    def stop_listening
+      return unless listening?
+
+      @stream.stop
+      @stream = nil
     end
 
     # Get the transcript for the given date (Returns a hash in the same format as #listen)
