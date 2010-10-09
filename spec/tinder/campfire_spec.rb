@@ -7,7 +7,7 @@ describe Tinder::Campfire do
   
   describe "rooms" do
     before do
-      FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/rooms.json",
+      FakeWeb.register_uri(:get, "https://mytoken:X@test.campfirenow.com/rooms.json",
         :body => fixture('rooms.json'), :content_type => "application/json")
     end
     
@@ -25,10 +25,10 @@ describe Tinder::Campfire do
   
   describe "users" do
     before do
-      FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/rooms.json",
+      FakeWeb.register_uri(:get, "https://mytoken:X@test.campfirenow.com/rooms.json",
         :body => fixture('rooms.json'), :content_type => "application/json")
       [80749, 80751].each do |id|
-        FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/room/#{id}.json",
+        FakeWeb.register_uri(:get, "https://mytoken:X@test.campfirenow.com/room/#{id}.json",
         :body => fixture("rooms/room#{id}.json"), :content_type => "application/json")
       end
     end
@@ -42,7 +42,7 @@ describe Tinder::Campfire do
   
   describe "me" do
     before do
-      FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/users/me.json",
+      FakeWeb.register_uri(:get, "https://mytoken:X@test.campfirenow.com/users/me.json",
         :body => fixture('users/me.json'), :content_type => "application/json")
     end
     

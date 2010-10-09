@@ -23,7 +23,7 @@ module Tinder
     
     def initialize(subdomain, options = {})
       @subdomain = subdomain
-      @options = { :ssl => false, :proxy => ENV['HTTP_PROXY'] }.merge(options)
+      @options = { :ssl => true, :proxy => ENV['HTTP_PROXY'] }.merge(options)
       @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       @token = options[:token]
       

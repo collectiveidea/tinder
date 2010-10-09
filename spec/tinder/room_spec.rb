@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Tinder::Room do
   before do
-    FakeWeb.register_uri(:get, "http://mytoken:X@test.campfirenow.com/room/80749.json",
+    FakeWeb.register_uri(:get, "https://mytoken:X@test.campfirenow.com/room/80749.json",
       :body => fixture('rooms/show.json'), :content_type => "application/json")
     @room = Tinder::Room.new(Tinder::Connection.new('test', :token => 'mytoken'), 'id' => 80749)
 
@@ -15,7 +15,7 @@ describe Tinder::Room do
   end
 
   describe "join" do
-    FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/join.json", :status => '200')
+    FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/join.json", :status => '200')
 
     it "should post to join url" do
       @room.join
@@ -24,7 +24,7 @@ describe Tinder::Room do
 
   describe "leave" do
     before do
-      FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/leave.json", :status => '200')
+      FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/leave.json", :status => '200')
     end
 
     it "should post to leave url" do
@@ -39,7 +39,7 @@ describe Tinder::Room do
 
   describe "lock" do
     before do
-      FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/lock.json", :status => '200')
+      FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/lock.json", :status => '200')
     end
 
     it "should post to lock url" do
@@ -49,7 +49,7 @@ describe Tinder::Room do
 
   describe "unlock" do
     before do
-      FakeWeb.register_uri(:post, "http://mytoken:X@test.campfirenow.com/room/80749/unlock.json", :status => '200')
+      FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/unlock.json", :status => '200')
     end
 
     it "should post to unlock url" do
@@ -60,7 +60,7 @@ describe Tinder::Room do
   describe "guest_url" do
     it "should use guest_invite_code if active" do
       @room.stub!(:guest_access_enabled? => true, :guest_invite_code => '123')
-      @room.guest_url.should == "http://test.campfirenow.com/123"
+      @room.guest_url.should == "https://test.campfirenow.com/123"
     end
 
     it "should return nil when guest access is not enabled" do
@@ -79,7 +79,7 @@ describe Tinder::Room do
 
   describe "name=" do
     it "should put to update the room" do
-      FakeWeb.register_uri(:put, "http://mytoken:X@test.campfirenow.com/room/80749.json",
+      FakeWeb.register_uri(:put, "https://mytoken:X@test.campfirenow.com/room/80749.json",
         :status => '200')
       @room.name = "Foo"
     end
@@ -88,7 +88,7 @@ describe Tinder::Room do
   describe "listen" do
     it "should get from the streaming url" do
       Twitter::JSONStream.should_receive(:connect).
-        with({:host=>"streaming.campfirenow.com", :path=>"/room/80749/live.json", :auth=>"mytoken:X", :timeout=>6, :ssl=>false}).
+        with({:host=>"streaming.campfirenow.com", :path=>"/room/80749/live.json", :auth=>"mytoken:X", :timeout=>6, :ssl=>true}).
         and_return(@stream)
       @room.listen { }
     end

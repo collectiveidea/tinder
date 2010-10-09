@@ -1,3 +1,7 @@
+1.4.1 - 2010-10-09
+* Make SSL the default since it is available for all Campfire accounts.
+* Added MIT License
+
 1.4 - 2010-05-11
 * Remove methods no longer supported by API
   Campfire#available_transcripts, Room#ping, Room#destroy, Room#toggle_guest_access
