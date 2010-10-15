@@ -22,6 +22,8 @@ module Tinder
       @raw_connection ||= Faraday::Connection.new do |conn|
         conn.adapter  Faraday.default_adapter
         conn.use      Tinder::FaradayResponse::RaiseOnAuthenticationFailure
+        conn.use      Faraday::Response::ActiveSupportJson
+        conn.use      Tinder::FaradayResponse::WithIndifferentAccess
       end
     end
 

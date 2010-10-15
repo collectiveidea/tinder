@@ -220,11 +220,11 @@ module Tinder
       end
 
       def raw_post(action, body = nil)
-        connection.raw_post(room_url_for(action, ''), body)
+        connection.raw_post(room_url_for(action), body)
       end
 
-      def room_url_for(action, ext = '.json')
-        "/room/#{@id}/#{action}#{ext}"
+      def room_url_for(action)
+        "/room/#{@id}/#{action}.json"
       end
 
       def connection
