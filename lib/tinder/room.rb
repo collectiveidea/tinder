@@ -179,8 +179,8 @@ module Tinder
     end
 
     def upload(file, content_type = nil, filename = nil)
-      content_type ||= MIME::Types.type_for(filename)
-      post(:uploads, { :upload => Faraday::UploadIO.new(file, content_type, filename) })
+      content_type ||= MIME::Types.type_for(file)
+      raw_post(:uploads, { :upload => Faraday::UploadIO.new(file, content_type, filename) })
     end
 
     # Get the list of latest files for this room
@@ -219,8 +219,12 @@ module Tinder
         connection.post(room_url_for(action), body)
       end
 
-      def room_url_for(action)
-        "/room/#{@id}/#{action}.json"
+      def raw_post(action, body = nil)
+        connection.raw_post(room_url_for(action, ''), body)
+      end
+
+      def room_url_for(action, ext = '.json')
+        "/room/#{@id}/#{action}#{ext}"
       end
 
       def connection

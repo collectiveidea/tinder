@@ -5,7 +5,7 @@ module Tinder
     HOST = "campfirenow.com"
 
     attr_reader :subdomain, :uri, :options
-    
+
     def self.connection
       @connection ||= Faraday::Connection.new do |conn|
         conn.use      Faraday::Request::ActiveSupportJson
@@ -15,7 +15,13 @@ module Tinder
         conn.use      Tinder::FaradayResponse::WithIndifferentAccess
 
         conn.headers['Content-Type'] = 'application/json'
-        conn.proxy ENV['HTTP_PROXY']
+      end
+    end
+
+    def self.raw_connection
+      @raw_connection ||= Faraday::Connection.new do |conn|
+        conn.adapter  Faraday.default_adapter
+        conn.use      Tinder::FaradayResponse::RaiseOnAuthenticationFailure
       end
     end
 
@@ -24,10 +30,11 @@ module Tinder
       @options = { :ssl => true, :proxy => ENV['HTTP_PROXY'] }.merge(options)
       @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       @token = options[:token]
-      
+
       connection.basic_auth token, 'X'
+      raw_connection.basic_auth token, 'X'
     end
-    
+
     def basic_auth_settings
       { :username => token, :password => 'X' }
     end
@@ -35,12 +42,21 @@ module Tinder
     def connection
       @connection ||= begin
         conn = self.class.connection.dup
-        puts "Setting to: #{@uri.to_s}"
         conn.url_prefix = @uri.to_s
+        conn.proxy options[:proxy]
         conn
       end
     end
-    
+
+    def raw_connection
+      @raw_connection ||= begin
+        conn = self.class.raw_connection.dup
+        conn.url_prefix = @uri.to_s
+        conn.proxy options[:proxy]
+        conn
+      end
+    end
+
     def token
       @token ||= begin
         connection.basic_auth(options[:username], options[:password])
@@ -56,6 +72,10 @@ module Tinder
     def post(url, body = nil, *args)
       response = connection.post(url, body, *args)
       response.body
+    end
+
+    def raw_post(url, body = nil, *args)
+      response = raw_connection.post(url, body, *args)
     end
 
     def put(url, body = nil, *args)
