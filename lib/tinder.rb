@@ -2,7 +2,6 @@ require 'active_support'
 require 'active_support/json'
 
 require 'tinder/connection'
-require 'tinder/multipart'
 require 'tinder/campfire'
 require 'tinder/room'
 require 'tinder/middleware'
