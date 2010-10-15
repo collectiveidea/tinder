@@ -179,7 +179,7 @@ module Tinder
     end
 
     def upload(file, content_type = nil, filename = nil)
-      content_type ||= MIME::Types.type_for(file)
+      content_type ||= MIME::Types.type_for(filename || file)
       raw_post(:uploads, { :upload => Faraday::UploadIO.new(file, content_type, filename) })
     end
 
