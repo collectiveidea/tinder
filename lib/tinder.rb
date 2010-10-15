@@ -5,6 +5,7 @@ require 'tinder/connection'
 require 'tinder/multipart'
 require 'tinder/campfire'
 require 'tinder/room'
+require 'tinder/middleware'
 
 module Tinder
   class Error < StandardError; end

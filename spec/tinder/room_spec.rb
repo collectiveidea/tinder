@@ -2,9 +2,13 @@ require 'spec_helper'
 
 describe Tinder::Room do
   before do
-    FakeWeb.register_uri(:get, "https://mytoken:X@test.campfirenow.com/room/80749.json",
-      :body => fixture('rooms/show.json'), :content_type => "application/json")
-    @room = Tinder::Room.new(Tinder::Connection.new('test', :token => 'mytoken'), 'id' => 80749)
+    @connection = Tinder::Connection.new('test', :token => 'mytoken')
+
+    stub_connection(@connection) do |stub|
+      stub.get('/room/80749.json') {[ 200, {}, fixture('rooms/show.json') ]}
+    end
+
+    @room = Tinder::Room.new(@connection, 'id' => 80749)
 
     # Get EventMachine out of the way. We could be using em-spec, but seems like overkill
     require 'twitter/json_stream'
@@ -15,7 +19,12 @@ describe Tinder::Room do
   end
 
   describe "join" do
-    FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/join.json", :status => '200')
+    before do
+      stub_connection(@connection) do |stub|
+        stub.post('/room/80749/join.json') {[ 200, {}, "" ]}
+      end
+    end
+
 
     it "should post to join url" do
       @room.join
@@ -24,7 +33,9 @@ describe Tinder::Room do
 
   describe "leave" do
     before do
-      FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/leave.json", :status => '200')
+      stub_connection(@connection) do |stub|
+        stub.post('/room/80749/leave.json') {[ 200, {}, "" ]}
+      end
     end
 
     it "should post to leave url" do
@@ -39,7 +50,9 @@ describe Tinder::Room do
 
   describe "lock" do
     before do
-      FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/lock.json", :status => '200')
+      stub_connection(@connection) do |stub|
+        stub.post('/room/80749/lock.json') {[ 200, {}, "" ]}
+      end
     end
 
     it "should post to lock url" do
@@ -49,7 +62,9 @@ describe Tinder::Room do
 
   describe "unlock" do
     before do
-      FakeWeb.register_uri(:post, "https://mytoken:X@test.campfirenow.com/room/80749/unlock.json", :status => '200')
+      stub_connection(@connection) do |stub|
+        stub.post('/room/80749/unlock.json') {[ 200, {}, "" ]}
+      end
     end
 
     it "should post to unlock url" do
@@ -79,13 +94,21 @@ describe Tinder::Room do
 
   describe "name=" do
     it "should put to update the room" do
-      FakeWeb.register_uri(:put, "https://mytoken:X@test.campfirenow.com/room/80749.json",
-        :status => '200')
+      stub_connection(@connection) do |stub|
+        stub.put('/room/80749.json') {[ 200, {}, "" ]}
+      end
+
       @room.name = "Foo"
     end
   end
 
   describe "listen" do
+    before do
+      stub_connection(@connection) do |stub|
+        stub.post('/room/80749/join.json') {[ 200, {}, "" ]}
+      end
+    end
+
     it "should get from the streaming url" do
       Twitter::JSONStream.should_receive(:connect).
         with({:host=>"streaming.campfirenow.com", :path=>"/room/80749/live.json", :auth=>"mytoken:X", :timeout=>6, :ssl=>true}).
@@ -109,6 +132,10 @@ describe Tinder::Room do
 
   describe "stop_listening" do
     before do
+      stub_connection(@connection) do |stub|
+        stub.post('/room/80749/join.json') {[ 200, {}, "" ]}
+      end
+
       Twitter::JSONStream.stub!(:connect).and_return(@stream)
       @stream.stub!(:stop)
     end

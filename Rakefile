@@ -9,7 +9,8 @@ begin
     gem.homepage = 'http://github.com/collectiveidea/tinder'
     gem.rubyforge_project = "tinder"
     gem.add_dependency "activesupport"
-    gem.add_dependency "httparty"
+    gem.add_dependency "faraday", "~> 0.5.0"
+    gem.add_dependency "multipart-post"
     gem.add_dependency "mime-types"
     gem.add_dependency "twitter-stream"
     gem.add_dependency "eventmachine"

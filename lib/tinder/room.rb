@@ -49,7 +49,7 @@ module Tinder
     end
 
     def update(attrs)
-      connection.put("/room/#{@id}.json", :body => {:room => attrs}.to_json)
+      connection.put("/room/#{@id}.json", {:room => attrs})
     end
 
     # Get the current topic
@@ -125,7 +125,7 @@ module Tinder
 
       require 'twitter/json_stream'
 
-      auth = connection.default_options[:basic_auth]
+      auth = connection.basic_auth_settings
       options = {
         :host => "streaming.#{Connection::HOST}",
         :path => room_url_for(:live),
@@ -178,11 +178,9 @@ module Tinder
       end
     end
 
-    def upload(filename)
-      File.open(filename, "rb") do |file|
-        params = Multipart::MultipartPost.new('upload' => file)
-        post(:uploads, :body => params.query)
-      end
+    def upload(file, content_type = nil, filename = nil)
+      content_type ||= MIME::Types.type_for(filename)
+      post(:uploads, { :upload => Faraday::UploadIO.new(file, content_type, filename) })
     end
 
     # Get the list of latest files for this room
@@ -210,15 +208,15 @@ module Tinder
       end
 
       def send_message(message, type = 'TextMessage')
-        post 'speak', :body => {:message => {:body => message, :type => type}}.to_json
+        post 'speak', {:message => {:body => message, :type => type}}
       end
 
-      def get(action, options = {})
-        connection.get(room_url_for(action), options)
+      def get(action)
+        connection.get(room_url_for(action))
       end
 
-      def post(action, options = {})
-        connection.post(room_url_for(action), options)
+      def post(action, body = nil)
+        connection.post(room_url_for(action), body)
       end
 
       def room_url_for(action)

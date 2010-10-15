@@ -45,7 +45,7 @@ module Tinder
 
     # Creates and returns a new Room with the given +name+ and optionally a +topic+
     def create_room(name, topic = nil)
-      connection.post('/rooms.json', :body => { :room => { :name => name, :topic => topic } }.to_json)
+      connection.post('/rooms.json', { :room => { :name => name, :topic => topic } })
       find_room_by_name(name)
     end
 

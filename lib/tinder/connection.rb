@@ -1,19 +1,4 @@
-require 'httparty'
-require 'active_support/core_ext/hash/indifferent_access'
-
-# override HTTParty's json parser to return a HashWithIndifferentAccess
-module HTTParty
-  class Parser
-    protected
-    def json
-      result = Crack::JSON.parse(body)
-      if result.is_a?(Hash)
-        result = HashWithIndifferentAccess.new(result)
-      end
-      result
-    end
-  end
-end
+require 'faraday'
 
 module Tinder
   class Connection
@@ -21,55 +6,66 @@ module Tinder
 
     attr_reader :subdomain, :uri, :options
     
+    def self.connection
+      @connection ||= Faraday::Connection.new do |conn|
+        conn.use      Faraday::Request::ActiveSupportJson
+        conn.adapter  Faraday.default_adapter
+        conn.use      Tinder::FaradayResponse::RaiseOnAuthenticationFailure
+        conn.use      Faraday::Response::ActiveSupportJson
+        conn.use      Tinder::FaradayResponse::WithIndifferentAccess
+
+        conn.headers['Content-Type'] = 'application/json'
+        conn.proxy ENV['HTTP_PROXY']
+      end
+    end
+
     def initialize(subdomain, options = {})
       @subdomain = subdomain
       @options = { :ssl => true, :proxy => ENV['HTTP_PROXY'] }.merge(options)
       @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       @token = options[:token]
       
-      
-      class << self
-        include HTTParty
-        extend HTTPartyExtensions
-        
-        headers 'Content-Type' => 'application/json'
-      end
-      
-      if @options[:proxy]
-        proxy_uri = URI.parse(@options[:proxy])
-        http_proxy proxy_uri.host, proxy_uri.port
-      end
-      base_uri @uri.to_s
-      basic_auth token, 'X'
+      connection.basic_auth token, 'X'
     end
     
-    module HTTPartyExtensions
-      def perform_request(http_method, path, options) #:nodoc:
-        response = super
-        raise AuthenticationFailed if response.code == 401
-        response
+    def basic_auth_settings
+      { :username => token, :password => 'X' }
+    end
+
+    def connection
+      @connection ||= begin
+        conn = self.class.connection.dup
+        puts "Setting to: #{@uri.to_s}"
+        conn.url_prefix = @uri.to_s
+        conn
       end
     end
     
     def token
       @token ||= begin
-        self.basic_auth(options[:username], options[:password])
-        self.get('/users/me.json')['user']['api_auth_token']
+        connection.basic_auth(options[:username], options[:password])
+        get('/users/me.json')['user']['api_auth_token']
       end
     end
 
-    def metaclass
-      class << self; self; end
+    def get(url, *args)
+      response = connection.get(url, *args)
+      response.body
     end
 
-    def method_missing(*args, &block)
-      metaclass.send(*args, &block)
+    def post(url, body = nil, *args)
+      response = connection.post(url, body, *args)
+      response.body
     end
-    
+
+    def put(url, body = nil, *args)
+      response = connection.put(url, body, *args)
+      response.body
+    end
+
     # Is the connection to campfire using ssl?
     def ssl?
       uri.scheme == 'https'
     end
-    
   end
 end
