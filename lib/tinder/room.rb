@@ -188,47 +188,48 @@ module Tinder
       get(:uploads)['uploads'].map { |u| u['full_url'] }
     end
 
-    protected
-      def load
-        reload! unless @loaded
-      end
+  protected
 
-      def reload!
-        attributes = connection.get("/room/#{@id}.json")['room']
+    def load
+      reload! unless @loaded
+    end
 
-        @id = attributes['id']
-        @name = attributes['name']
-        @topic = attributes['topic']
-        @full = attributes['full']
-        @open_to_guests = attributes['open_to_guests']
-        @active_token_value = attributes['active_token_value']
-        @users = attributes['users']
+    def reload!
+      attributes = connection.get("/room/#{@id}.json")['room']
 
-        @loaded = true
-      end
+      @id = attributes['id']
+      @name = attributes['name']
+      @topic = attributes['topic']
+      @full = attributes['full']
+      @open_to_guests = attributes['open_to_guests']
+      @active_token_value = attributes['active_token_value']
+      @users = attributes['users']
 
-      def send_message(message, type = 'TextMessage')
-        post 'speak', {:message => {:body => message, :type => type}}
-      end
+      @loaded = true
+    end
 
-      def get(action)
-        connection.get(room_url_for(action))
-      end
+    def send_message(message, type = 'TextMessage')
+      post 'speak', {:message => {:body => message, :type => type}}
+    end
 
-      def post(action, body = nil)
-        connection.post(room_url_for(action), body)
-      end
+    def get(action)
+      connection.get(room_url_for(action))
+    end
 
-      def raw_post(action, body = nil)
-        connection.raw_post(room_url_for(action), body)
-      end
+    def post(action, body = nil)
+      connection.post(room_url_for(action), body)
+    end
 
-      def room_url_for(action)
-        "/room/#{@id}/#{action}.json"
-      end
+    def raw_post(action, body = nil)
+      connection.raw_post(room_url_for(action), body)
+    end
 
-      def connection
-        @connection
-      end
+    def room_url_for(action)
+      "/room/#{@id}/#{action}.json"
+    end
+
+    def connection
+      @connection
+    end
   end
 end
