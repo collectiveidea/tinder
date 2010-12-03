@@ -30,7 +30,7 @@ module Tinder
 
     def initialize(subdomain, options = {})
       @subdomain = subdomain
-      @options = { :ssl => true, :proxy => ENV['HTTP_PROXY'] }.merge(options)
+      @options = { :ssl => true, :ssl_verify => true, :proxy => ENV['HTTP_PROXY'] }.merge(options)
       @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       @token = options[:token]
 
@@ -47,6 +47,9 @@ module Tinder
         conn = self.class.connection.dup
         conn.url_prefix = @uri.to_s
         conn.proxy options[:proxy]
+        if options[:ssl_verify] == false
+          conn.ssl[:verify] = false
+        end
         conn
       end
     end
@@ -56,6 +59,9 @@ module Tinder
         conn = self.class.raw_connection.dup
         conn.url_prefix = @uri.to_s
         conn.proxy options[:proxy]
+        if options[:ssl_verify] == false
+          conn.ssl[:verify] = false
+        end
         conn
       end
     end
