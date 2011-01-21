@@ -66,6 +66,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<mime-types>, [">= 0"])
       s.add_runtime_dependency(%q<twitter-stream>, [">= 0"])
       s.add_runtime_dependency(%q<eventmachine>, [">= 0"])
+      s.add_runtime_dependency(%q<json>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<fakeweb>, [">= 0"])
     else
@@ -75,6 +76,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<mime-types>, [">= 0"])
       s.add_dependency(%q<twitter-stream>, [">= 0"])
       s.add_dependency(%q<eventmachine>, [">= 0"])
+      s.add_dependency(%q<json>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<fakeweb>, [">= 0"])
     end
@@ -85,6 +87,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<mime-types>, [">= 0"])
     s.add_dependency(%q<twitter-stream>, [">= 0"])
     s.add_dependency(%q<eventmachine>, [">= 0"])
+    s.add_dependency(%q<json>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<fakeweb>, [">= 0"])
   end
