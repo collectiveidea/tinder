@@ -140,7 +140,7 @@ module Tinder
       EventMachine::run do
         @stream = Twitter::JSONStream.connect(options)
         @stream.each_item do |message|
-          message = HashWithIndifferentAccess.new(JSON.parse(message))
+          message = HashWithIndifferentAccess.new(ActiveSupport::JSON.decode(message))
           message[:user] = user(message.delete(:user_id))
           message[:created_at] = Time.parse(message[:created_at])
           yield(message)
