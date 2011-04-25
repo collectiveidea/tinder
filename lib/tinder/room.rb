@@ -140,11 +140,20 @@ module Tinder
       EventMachine::run do
         @stream = Twitter::JSONStream.connect(options)
         @stream.each_item do |message|
-          message = HashWithIndifferentAccess.new(JSON.parse(message))
+          message = HashWithIndifferentAccess.new(ActiveSupport::JSON.decode(message))
           message[:user] = user(message.delete(:user_id))
           message[:created_at] = Time.parse(message[:created_at])
           yield(message)
         end
+
+        @stream.on_error do |message|
+          raise ListenFailed.new("got an error! #{message.inspect}!") 
+        end
+
+        @stream.on_max_reconnects do |timeout, retries|
+          raise ListenFailed.new("Tried #{retries} times to connect. Got disconnected from #{@name}!")
+        end
+        
         # if we really get disconnected
         raise ListenFailed.new("got disconnected from #{@name}!") if !EventMachine.reactor_running?
       end
