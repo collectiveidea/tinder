@@ -1,3 +1,4 @@
-pkg
-rdoc
-test/remote/credentials.rb
+*.gem
+.bundle
+Gemfile.lock
+pkg/*

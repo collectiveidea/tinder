@@ -1,7 +1,7 @@
 $:.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
-require 'spec'
+require 'rspec'
 gem 'activesupport', ENV['RAILS_VERSION'] if ENV['RAILS_VERSION']
 require 'tinder'
 require 'fakeweb'
