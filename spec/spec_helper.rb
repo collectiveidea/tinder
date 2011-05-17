@@ -1,8 +1,6 @@
 $:.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
-require 'rubygems'
 require 'rspec'
-gem 'activesupport', ENV['RAILS_VERSION'] if ENV['RAILS_VERSION']
 require 'tinder'
 require 'fakeweb'
 
@@ -15,12 +13,12 @@ end
 def stub_connection(object, &block)
   @stubs ||= Faraday::Adapter::Test::Stubs.new
 
-  object.connection.build do |conn|
-    conn.use      Faraday::Request::ActiveSupportJson
-    conn.adapter :test, @stubs
-    conn.use      Tinder::FaradayResponse::RaiseOnAuthenticationFailure
-    conn.use      Faraday::Response::ActiveSupportJson
-    conn.use      Tinder::FaradayResponse::WithIndifferentAccess
+  object.connection.build do |builder|
+    builder.use     Faraday::Request::JSON
+    builder.use     Faraday::Response::Mashify
+    builder.use     Faraday::Response::ParseJson
+    builder.use     Faraday::Response::RaiseOnAuthenticationFailure
+    builder.adapter :test, @stubs
   end
 
   block.call(@stubs)
