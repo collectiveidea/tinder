@@ -24,6 +24,42 @@ describe Tinder::Campfire do
     end
   end
   
+  describe "find_by_id" do
+    before do
+      stub_connection(@campfire.connection) do |stub|
+        stub.get('/rooms.json') {[ 200, {}, fixture('rooms.json') ]}
+      end
+    end
+    
+    it "should return a Tinder::Room object when a match is found" do
+      room = @campfire.find_room_by_id 80749
+      room.should be_kind_of(Tinder::Room)
+    end
+    
+    it "should return nil when no match is found" do
+      room = @campfire.find_room_by_id 123
+      room.should be nil
+    end
+  end
+  
+  describe "find_room_by_name" do
+    before do
+      stub_connection(@campfire.connection) do |stub|
+        stub.get('/rooms.json') {[ 200, {}, fixture('rooms.json') ]}
+      end
+    end
+    
+    it "should return a Tinder::Room object when a match is found" do
+      room = @campfire.find_room_by_name 'Room 1'
+      room.should be_kind_of(Tinder::Room)
+    end
+    
+    it "should return nil when no match is found" do
+      room = @campfire.find_room_by_name 'asdf'
+      room.should be nil
+    end
+  end
+  
   describe "users" do
     before do
       stub_connection(@campfire.connection) do |stub|
