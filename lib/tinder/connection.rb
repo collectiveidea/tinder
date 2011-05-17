@@ -1,30 +1,31 @@
-require 'uri'
+require 'active_support/json'
 require 'faraday'
+require 'faraday/response/raise_on_authentication_failure'
+require 'faraday_middleware'
+require 'uri'
 
 module Tinder
   class Connection
-    HOST = "campfirenow.com"
+    HOST = 'campfirenow.com'
 
     attr_reader :subdomain, :uri, :options
 
     def self.connection
-      @connection ||= Faraday::Connection.new do |conn|
-        conn.use      Faraday::Request::ActiveSupportJson
-        conn.adapter  Faraday.default_adapter
-        conn.use      Tinder::FaradayResponse::RaiseOnAuthenticationFailure
-        conn.use      Faraday::Response::ActiveSupportJson
-        conn.use      Tinder::FaradayResponse::WithIndifferentAccess
-
-        conn.headers['Content-Type'] = 'application/json'
+      @connection ||= Faraday.new do |builder|
+        builder.use     Faraday::Request::JSON
+        builder.use     Faraday::Response::Mashify
+        builder.use     Faraday::Response::ParseJson
+        builder.use     Faraday::Response::RaiseOnAuthenticationFailure
+        builder.adapter Faraday.default_adapter
       end
     end
 
     def self.raw_connection
-      @raw_connection ||= Faraday::Connection.new do |conn|
-        conn.adapter  Faraday.default_adapter
-        conn.use      Tinder::FaradayResponse::RaiseOnAuthenticationFailure
-        conn.use      Faraday::Response::ActiveSupportJson
-        conn.use      Tinder::FaradayResponse::WithIndifferentAccess
+      @raw_connection ||= Faraday.new do |builder|
+        builder.use     Faraday::Response::Mashify
+        builder.use     Faraday::Response::ParseJson
+        builder.use     Faraday::Response::RaiseOnAuthenticationFailure
+        builder.adapter Faraday.default_adapter
       end
     end
 
@@ -39,7 +40,7 @@ module Tinder
     end
 
     def basic_auth_settings
-      { :username => token, :password => 'X' }
+      {:username => token, :password => 'X'}
     end
 
     def connection
