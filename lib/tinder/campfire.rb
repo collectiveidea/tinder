@@ -32,6 +32,11 @@ module Tinder
         Room.new(connection, room)
       end
     end
+    
+    # Find a campfire room by id
+    def find_room_by_id(id)
+      rooms.detect { |room| room.id == id }
+    end
 
     # Find a campfire room by name
     def find_room_by_name(name)
