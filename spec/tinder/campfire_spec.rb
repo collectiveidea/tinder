@@ -8,7 +8,7 @@ describe Tinder::Campfire do
   describe "rooms" do
     before do
       stub_connection(@campfire.connection) do |stub|
-        stub.get('/rooms.json') {[ 200, {}, fixture('rooms.json') ]}
+        stub.get('/rooms.json') {[200, {}, fixture('rooms.json')]}
       end
     end
 
@@ -27,7 +27,7 @@ describe Tinder::Campfire do
   describe "find_by_id" do
     before do
       stub_connection(@campfire.connection) do |stub|
-        stub.get('/rooms.json') {[ 200, {}, fixture('rooms.json') ]}
+        stub.get('/rooms.json') {[200, {}, fixture('rooms.json')]}
       end
     end
 
@@ -45,7 +45,7 @@ describe Tinder::Campfire do
   describe "find_room_by_name" do
     before do
       stub_connection(@campfire.connection) do |stub|
-        stub.get('/rooms.json') {[ 200, {}, fixture('rooms.json') ]}
+        stub.get('/rooms.json') {[200, {}, fixture('rooms.json')]}
       end
     end
 
@@ -63,10 +63,10 @@ describe Tinder::Campfire do
   describe "users" do
     before do
       stub_connection(@campfire.connection) do |stub|
-        stub.get('/rooms.json') {[ 200, {}, fixture('rooms.json') ]}
+        stub.get('/rooms.json') {[200, {}, fixture('rooms.json')]}
 
         [80749, 80751].each do |id|
-          stub.get("/room/#{id}.json") {[ 200, {}, fixture("rooms/room#{id}.json") ]}
+          stub.get("/room/#{id}.json") {[200, {}, fixture("rooms/room#{id}.json")]}
         end
       end
     end
@@ -81,7 +81,7 @@ describe Tinder::Campfire do
   describe "me" do
     before do
       stub_connection(@campfire.connection) do |stub|
-        stub.get("/users/me.json") {[ 200, {}, fixture('users/me.json') ]}
+        stub.get("/users/me.json") {[200, {}, fixture('users/me.json')]}
       end
     end
 

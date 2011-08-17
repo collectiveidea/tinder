@@ -5,7 +5,7 @@ describe Tinder::Room do
     @connection = Tinder::Connection.new('test', :token => 'mytoken')
 
     stub_connection(@connection) do |stub|
-      stub.get('/room/80749.json') {[ 200, {}, fixture('rooms/show.json') ]}
+      stub.get('/room/80749.json') {[200, {}, fixture('rooms/show.json')]}
     end
 
     @room = Tinder::Room.new(@connection, 'id' => 80749)
@@ -23,10 +23,9 @@ describe Tinder::Room do
   describe "join" do
     before do
       stub_connection(@connection) do |stub|
-        stub.post('/room/80749/join.json') {[ 200, {}, "" ]}
+        stub.post('/room/80749/join.json') {[200, {}, ""]}
       end
     end
-
 
     it "should post to join url" do
       @room.join
@@ -36,7 +35,7 @@ describe Tinder::Room do
   describe "leave" do
     before do
       stub_connection(@connection) do |stub|
-        stub.post('/room/80749/leave.json') {[ 200, {}, "" ]}
+        stub.post('/room/80749/leave.json') {[200, {}, ""]}
       end
     end
 
@@ -53,7 +52,7 @@ describe Tinder::Room do
   describe "lock" do
     before do
       stub_connection(@connection) do |stub|
-        stub.post('/room/80749/lock.json') {[ 200, {}, "" ]}
+        stub.post('/room/80749/lock.json') {[200, {}, ""]}
       end
     end
 
@@ -65,7 +64,7 @@ describe Tinder::Room do
   describe "unlock" do
     before do
       stub_connection(@connection) do |stub|
-        stub.post('/room/80749/unlock.json') {[ 200, {}, "" ]}
+        stub.post('/room/80749/unlock.json') {[200, {}, ""]}
       end
     end
 
@@ -97,7 +96,7 @@ describe Tinder::Room do
   describe "name=" do
     it "should put to update the room" do
       stub_connection(@connection) do |stub|
-        stub.put('/room/80749.json') {[ 200, {}, "" ]}
+        stub.put('/room/80749.json') {[200, {}, ""]}
       end
 
       @room.name = "Foo"
@@ -107,14 +106,21 @@ describe Tinder::Room do
   describe "listen" do
     before do
       stub_connection(@connection) do |stub|
-        stub.post('/room/80749/join.json') {[ 200, {}, "" ]}
+        stub.post('/room/80749/join.json') {[200, {}, ""]}
       end
     end
 
     it "should get from the streaming url" do
-      Twitter::JSONStream.should_receive(:connect).
-        with({:host=>"streaming.campfirenow.com", :path=>"/room/80749/live.json", :auth=>"mytoken:X", :timeout=>6, :ssl=>true}).
-        and_return(@stream)
+      Twitter::JSONStream.should_receive(:connect).with(
+        {
+          :host=>"streaming.campfirenow.com",
+          :path=>"/room/80749/live.json",
+          :auth=>"mytoken:X",
+          :timeout=>6,
+          :ssl=>true
+        }
+      ).and_return(@stream)
+
       @room.listen { }
     end
 
@@ -135,7 +141,7 @@ describe Tinder::Room do
   describe "stop_listening" do
     before do
       stub_connection(@connection) do |stub|
-        stub.post('/room/80749/join.json') {[ 200, {}, "" ]}
+        stub.post('/room/80749/join.json') {[200, {}, ""]}
       end
 
       Twitter::JSONStream.stub!(:connect).and_return(@stream)
