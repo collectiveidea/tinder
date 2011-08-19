@@ -1,6 +1,7 @@
 require 'active_support/json'
 require 'faraday'
 require 'faraday/response/raise_on_authentication_failure'
+require 'faraday/response/remove_whitespace'
 require 'faraday_middleware'
 require 'uri'
 
@@ -15,6 +16,7 @@ module Tinder
         builder.use     Faraday::Request::JSON
         builder.use     Faraday::Response::Mashify
         builder.use     Faraday::Response::ParseJson
+        builder.use     Faraday::Response::RemoveWhitespace
         builder.use     Faraday::Response::RaiseOnAuthenticationFailure
         builder.adapter Faraday.default_adapter
       end
@@ -24,6 +26,7 @@ module Tinder
       @raw_connection ||= Faraday.new do |builder|
         builder.use     Faraday::Response::Mashify
         builder.use     Faraday::Response::ParseJson
+        builder.use     Faraday::Response::RemoveWhitespace
         builder.use     Faraday::Response::RaiseOnAuthenticationFailure
         builder.adapter Faraday.default_adapter
       end
