@@ -13,14 +13,14 @@ describe Tinder::Campfire do
     end
 
     it "should return rooms" do
-      @campfire.rooms.size.should == 2
+      @campfire.rooms.size.should be == 2
       @campfire.rooms.first.should be_kind_of(Tinder::Room)
     end
 
     it "should set the room name and id" do
       room = @campfire.rooms.first
-      room.name.should == 'Room 1'
-      room.id.should == 80749
+      room.name.should be == 'Room 1'
+      room.id.should be == 80749
     end
   end
 
@@ -72,9 +72,9 @@ describe Tinder::Campfire do
     end
 
     it "should return a sorted list of users in all rooms" do
-      @campfire.users.length.should == 2
-      @campfire.users.first[:name].should == "Jane Doe"
-      @campfire.users.last[:name].should == "John Doe"
+      @campfire.users.length.should be == 2
+      @campfire.users.first[:name].should be == "Jane Doe"
+      @campfire.users.last[:name].should be == "John Doe"
     end
   end
 
@@ -86,7 +86,7 @@ describe Tinder::Campfire do
     end
 
     it "should return the current user's information" do
-      @campfire.me["name"].should == "John Doe"
+      @campfire.me["name"].should be == "John Doe"
     end
   end
 end
