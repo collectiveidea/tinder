@@ -7,7 +7,7 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
     campfire = Tinder::Campfire.new 'mysubdomain', :token => '546884b3d8fee4d80665g561caf7h9f3ea7b999e'
     # or you can still use username/password and Tinder will look up your token
     # campfire = Tinder::Campfire.new 'mysubdomain', :username => 'user', :password => 'pass'
-  
+
     room = campfire.rooms.first
     room.rename 'New Room Names'
     room.speak 'Hello world!'
@@ -15,13 +15,17 @@ Tinder is a library for interfacing with Campfire, the chat application from 37S
 
     room = campfire.find_room_by_guest_hash 'abc123', 'John Doe'
     room.speak 'Hello world!'
-  
+
 See the RDoc for more details.
 
 ## Installation
 
     gem install tinder
-  
+
+## Continuous Integration
+
+[![Build Status](https://secure.travis-ci.org/collectiveidea/tinder.png)](http://travis-ci.org/collectiveidea/tinder)
+
 ## How to contribute
 
 If you find what looks like a bug:
