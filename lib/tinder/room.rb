@@ -64,12 +64,12 @@ module Tinder
 
     # Lock the room to prevent new users from entering and to disable logging
     def lock
-      post :lock
+      post 'lock'
     end
 
     # Unlock the room
     def unlock
-      post :unlock
+      post 'unlock'
     end
 
     # Post a new message to the chat room
@@ -139,11 +139,12 @@ module Tinder
       auth = connection.basic_auth_settings
       options = {
         :host => "streaming.#{Connection::HOST}",
-        :path => room_url_for(:live),
+        :path => room_url_for('live'),
         :auth => "#{auth[:username]}:#{auth[:password]}",
         :timeout => 6,
         :ssl => connection.options[:ssl]
       }.merge(options)
+
       EventMachine::run do
         @stream = Twitter::JSONStream.connect(options)
         @stream.each_item do |message|
