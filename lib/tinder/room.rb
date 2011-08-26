@@ -10,14 +10,18 @@ module Tinder
       @loaded = false
     end
 
-    # Join the room. Pass +true+ to join even if you've already joined.
-    def join(force = false)
-      post 'join'
+    # Join the room
+    # POST /room/#{id}/join.xml
+    # For whatever reason, #join() and #leave() are still xml endpoints
+    # whereas elsewhere in this API we're assuming json :\
+    def join
+      post 'join', 'xml'
     end
 
     # Leave a room
+    # POST /room/#{id}/leave.xml
     def leave
-      post 'leave'
+      post 'leave', 'xml'
       stop_listening
     end
 
@@ -241,8 +245,8 @@ module Tinder
       connection.raw_post(room_url_for(action), body)
     end
 
-    def room_url_for(action)
-      "/room/#{@id}/#{action}.json"
+    def room_url_for(action, format="json")
+      "/room/#{@id}/#{action}.#{format}"
     end
 
     def connection
