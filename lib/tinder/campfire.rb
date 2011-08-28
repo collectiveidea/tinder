@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Tinder
 
   # == Usage
@@ -32,7 +33,7 @@ module Tinder
         Room.new(connection, room)
       end
     end
-    
+
     # Find a campfire room by id
     def find_room_by_id(id)
       rooms.detect { |room| room.id == id }

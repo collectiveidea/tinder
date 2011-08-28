@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'tinder/connection'
 require 'tinder/campfire'
 require 'tinder/room'

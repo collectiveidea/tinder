@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'faraday'
 
 module Faraday

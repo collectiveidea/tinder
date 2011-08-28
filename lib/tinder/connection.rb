@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'active_support/json'
 require 'faraday'
 require 'faraday/response/raise_on_authentication_failure'
