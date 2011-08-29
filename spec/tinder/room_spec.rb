@@ -9,7 +9,7 @@ describe Tinder::Room do
       stub.get('/room/80749.json') {[200, {}, fixture('rooms/show.json')]}
     end
 
-    @room = Tinder::Room.new(@connection, 'id' => 80749)
+    @room = Tinder::Room.new(@connection, 'id' => 80749, 'name' => 'Room 1')
 
     # Get EventMachine out of the way. We could be using em-spec, but seems like overkill
     require 'twitter/json_stream'

@@ -130,6 +130,7 @@ module Tinder
     def listen(options = {})
       raise ArgumentError, "no block provided" unless block_given?
 
+      Tinder.logger.info "Joining #{@name}…"
       join # you have to be in the room to listen
 
       require 'active_support/json'
@@ -146,8 +147,10 @@ module Tinder
         :ssl => connection.options[:ssl]
       }.merge(options)
 
+      Tinder.logger.info "Starting EventMachine server…"
       EventMachine::run do
         @stream = Twitter::JSONStream.connect(options)
+        Tinder.logger.info "Listening to #{@name}…"
         @stream.each_item do |message|
           message = Hashie::Mash.new(MultiJson.decode(message))
           message[:user] = user(message.delete(:user_id))
@@ -175,6 +178,7 @@ module Tinder
     def stop_listening
       return unless listening?
 
+      Tinder.logger.info "Stopped listening to #{@name}…"
       @stream.stop
       @stream = nil
     end
