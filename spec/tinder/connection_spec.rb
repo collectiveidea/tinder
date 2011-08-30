@@ -21,7 +21,6 @@ describe Tinder::Connection do
       connection.token.should.should == "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     end
 
-
     it "should use basic auth for credentials" do
       stub_connection(Tinder::Connection) do |stub|
         stub.get("/rooms.json") {[200, {}, fixture('rooms.json')]}

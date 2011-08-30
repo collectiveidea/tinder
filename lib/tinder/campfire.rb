@@ -18,8 +18,8 @@ module Tinder
     #
     # == Options:
     # * +:ssl+: use SSL for the connection, which is required if you have a Campfire SSL account.
-    #           Defaults to false
-    # * +:ssl_verify+: verify SSL certificate using if using SSL
+    #           Defaults to true
+    # * +:ssl_verify+: verify SSL certificate if using SSL
     #           Defaults to true
     # * +:proxy+: a proxy URI. (e.g. :proxy => 'http://user:pass@example.com:8000')
     #
