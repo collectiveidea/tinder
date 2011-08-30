@@ -18,7 +18,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass')
-      connection.token.should.should == "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      connection.token.should == "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     end
 
     it "should use basic auth for credentials" do
@@ -27,6 +27,26 @@ describe Tinder::Connection do
       end
       connection = Tinder::Connection.new('test', :token => 'mytoken')
       lambda { connection.get('/rooms.json') }.should_not raise_error
+    end
+  end
+
+  describe "ssl" do
+    it "should turn on ssl by default" do
+      stub_connection(Tinder::Connection) do |stub|
+        stub.get("/users/me.json") {[200, {}, fixture('users/me.json')]}
+      end
+
+      connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass')
+      connection.ssl?.should be_true
+    end
+
+    it "should should allow peer verification to be turned off" do
+      stub_connection(Tinder::Connection) do |stub|
+        stub.get("/users/me.json") {[200, {}, fixture('users/me.json')]}
+      end
+
+      connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass', :ssl_verify => false)
+      connection.connection.ssl[:verify].should be == false
     end
   end
 end
