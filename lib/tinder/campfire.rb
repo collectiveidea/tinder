@@ -19,8 +19,8 @@ module Tinder
     # == Options:
     # * +:ssl+: use SSL for the connection, which is required if you have a Campfire SSL account.
     #           Defaults to true
-    # * +:ssl_verify+: verify SSL certificate if using SSL
-    #           Defaults to true
+    # * +:ssl_options+: SSL options passed to the underlaying Faraday connection. Allows to specify if the SSL certificate should be verified (:verify => true|false) and to specify the path to the ssl certs directory (:ca_path => "path/certs")
+    #           Defaults to {:verify => true}
     # * +:proxy+: a proxy URI. (e.g. :proxy => 'http://user:pass@example.com:8000')
     #
     #   c = Tinder::Campfire.new("mysubdomain", :ssl => true)
