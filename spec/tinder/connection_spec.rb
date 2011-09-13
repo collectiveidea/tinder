@@ -48,5 +48,13 @@ describe Tinder::Connection do
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass', :ssl_verify => false)
       connection.connection.ssl[:verify].should be == false
     end
+
+    it "should allow passing any ssl_options to Faraday" do
+      stub_connection(Tinder::Connection) do |stub|
+        stub.get("/users/me.json") {[200, {}, fixture('users/me.json')]}
+      end
+      connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass', :ssl_options => {:verify => false, :ca_path => "/usr/lib/ssl/certs"})
+      connection.connection.ssl.should eql(:verify => false, :ca_path => "/usr/lib/ssl/certs")
+    end
   end
 end
