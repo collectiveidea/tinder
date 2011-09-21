@@ -48,5 +48,17 @@ describe Tinder::Connection do
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass', :ssl_verify => false)
       connection.connection.ssl[:verify].should be == false
     end
+    
+    it 'should allow ca_path to be set' do
+      ca_path = "/etc/ssl/custom"
+      connection = Tinder::Connection.new('test', :ca_path => ca_path)
+      connection.connection.ssl[:ca_path].should == ca_path
+    end
+    
+    it 'should allow ca_file to be set' do
+      ca_file = "/etc/ssl/custom"
+      connection = Tinder::Connection.new('test', :ca_file => ca_file)
+      connection.connection.ssl[:ca_file].should == ca_file
+    end
   end
 end
