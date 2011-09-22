@@ -35,11 +35,9 @@ module Tinder
 
     def initialize(subdomain, options = {})
       @subdomain = subdomain
-
       @options = {:ssl => true, :ssl_options => {:verify => true}, :proxy => ENV['HTTP_PROXY']}
       @options[:ssl_options][:verify] = options.delete(:ssl_verify) unless options[:ssl_verify].nil?
       @options.merge!(options)
-
       @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       @token = options[:token]
 
@@ -54,11 +52,7 @@ module Tinder
     def connection
       @connection ||= begin
         conn = self.class.connection.dup
-        conn.url_prefix = @uri.to_s
-        conn.proxy options[:proxy]
-        if options[:ssl_options]
-          conn.ssl.merge!(options[:ssl_options])
-        end
+        set_connection_options(conn)
         conn
       end
     end
@@ -66,11 +60,7 @@ module Tinder
     def raw_connection
       @raw_connection ||= begin
         conn = self.class.raw_connection.dup
-        conn.url_prefix = @uri.to_s
-        conn.proxy options[:proxy]
-        if options[:ssl_options]
-          conn.ssl.merge!(options[:ssl_options])
-        end
+        set_connection_options(conn)
         conn
       end
     end
@@ -105,5 +95,15 @@ module Tinder
     def ssl?
       uri.scheme == 'https'
     end
+
+    private
+
+      def set_connection_options(conn)
+        conn.url_prefix = @uri.to_s
+        conn.proxy options[:proxy]
+        if options[:ssl_options]
+          conn.ssl.merge!(options[:ssl_options])
+        end
+      end
   end
 end
