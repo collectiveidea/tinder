@@ -53,8 +53,16 @@ describe Tinder::Connection do
       stub_connection(Tinder::Connection) do |stub|
         stub.get("/users/me.json") {[200, {}, fixture('users/me.json')]}
       end
-      connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass', :ssl_options => {:verify => false, :ca_path => "/usr/lib/ssl/certs"})
-      connection.connection.ssl.should eql(:verify => false, :ca_path => "/usr/lib/ssl/certs")
+      connection = Tinder::Connection.new('test',
+        :username => 'user',
+        :password => 'pass',
+        :ssl_options => {
+          :verify  => false,
+          :ca_path => "/usr/lib/ssl/certs",
+          :ca_file => "/etc/ssl/custom"
+        }
+      )
+      connection.connection.ssl.should eql(:verify => false, :ca_path => "/usr/lib/ssl/certs", :ca_file => "/etc/ssl/custom")
     end
   end
 end
