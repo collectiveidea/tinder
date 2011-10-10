@@ -12,6 +12,15 @@ describe Tinder::Connection do
       lambda { connection.get('/rooms.json') }.should raise_error(Tinder::AuthenticationFailed)
     end
 
+    it "should raise an exception when an invalid subdomain is specified" do
+      stub_connection(Tinder::Connection) do |stub|
+        stub.get("/rooms.json") {[404, {}, "Not found"]}
+      end
+
+      connection = Tinder::Connection.new('test', :token => 'foo')
+      lambda { connection.get('/rooms.json') }.should raise_error(Tinder::AuthenticationFailed)
+    end
+
     it "should lookup token when username/password provided" do
       stub_connection(Tinder::Connection) do |stub|
         stub.get("/users/me.json") {[200, {}, fixture('users/me.json')]}
