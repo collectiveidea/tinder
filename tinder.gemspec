@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'multipart-post', '~> 1.1'
   gem.add_runtime_dependency 'twitter-stream', '~> 0.1'
 
-  gem.authors = ["Brandon Keepers"]
+  gem.authors = ["Brandon Keepers", "Brian Ryckbost"]
   gem.description = %q{A Ruby API for interfacing with Campfire, the 37Signals chat application.}
   gem.email = ['brandon@opensoul.org']
   gem.extra_rdoc_files = ['README.markdown']
