@@ -93,6 +93,29 @@ describe Tinder::Room do
   it "should set guest_access_enabled?" do
     @room.guest_access_enabled?.should be_true
   end
+ 
+  describe "topic" do
+    it "should get the current topic" do
+      @room.topic.should == "Testing"
+    end
+    
+    it "should get the current topic even if it's changed" do
+      @room.topic.should == "Testing"
+      
+      # reinitialize a new connection since we can't modify the 
+      # faraday stack after a request has already been submitted
+      @connection = Tinder::Connection.new('test', :token => 'mytoken')
+      
+      # returning a different room's json to get a diff topic
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749.json') {[200, {}, fixture('rooms/room80751.json')]}
+      end
+      
+      @room.topic.should == "Testing 2"
+      
+    end
+  end
+
 
   describe "name=" do
     it "should put to update the room" do

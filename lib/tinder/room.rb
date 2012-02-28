@@ -59,7 +59,7 @@ module Tinder
 
     # Get the current topic
     def topic
-      load
+      reload!
       @topic
     end
 
