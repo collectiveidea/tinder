@@ -15,9 +15,9 @@ def stub_connection(object, &block)
   @stubs ||= Faraday::Adapter::Test::Stubs.new
 
   object.connection.build do |builder|
-    builder.use     Faraday::Request::JSON
-    builder.use     Faraday::Response::Mashify
-    builder.use     Faraday::Response::ParseJson
+    builder.use     FaradayMiddleware::EncodeJson
+    builder.use     FaradayMiddleware::Mashify
+    builder.use     FaradayMiddleware::ParseJson
     builder.use     Faraday::Response::RemoveWhitespace
     builder.use     Faraday::Response::RaiseOnAuthenticationFailure
     builder.adapter :test, @stubs
