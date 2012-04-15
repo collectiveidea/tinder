@@ -1,0 +1,19 @@
+{
+    "messages": [{
+        "starred": false,
+        "type": "TextMessage",
+        "room_id": 490096,
+        "created_at": "2012/04/05 10:53:14 +0000",
+        "id": 537713173,
+        "user_id": 1158839,
+        "body": "https://github.com/technomancy/dotfiles/commit/e19989d33777bb392c0ad1205444762dfecbaa5f "
+    }, {
+        "starred": false,
+        "type": "TextMessage",
+        "room_id": 490096,
+        "created_at": "2012/04/05 10:54:20 +0000",
+        "id": 537713420,
+        "user_id": 1158837,
+        "body": "Lol"
+    }]
+}

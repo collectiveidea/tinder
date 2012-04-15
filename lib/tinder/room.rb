@@ -215,6 +215,18 @@ module Tinder
       get(:uploads)['uploads'].map { |u| u['full_url'] }
     end
 
+    # Get a list of recent messages
+    # Accepts a hash for options:
+    # * +:limit+: Restrict the number of messages returned
+    # * +:since_message_id+: Get messages created after the specified message id
+    def recent(options={})
+      connection.get(room_url_for(:recent), options)['messages'].map do |msg|
+        msg[:created_at] = Time.parse(msg[:created_at])
+        msg[:user] = user(msg[:user_id])
+        msg
+      end
+    end
+
   protected
 
     def load
