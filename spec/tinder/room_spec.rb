@@ -191,4 +191,28 @@ describe Tinder::Room do
       @room.stop_listening
     end
   end
+
+  describe "recent" do
+    before do
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749/recent.json') {[
+          200, {}, fixture('rooms/recent.json')
+        ]}
+        stub.get('/users/1158839.json') {[
+          200, {}, fixture('users/me.json')
+        ]}
+        stub.get('/users/1158837.json') {[
+          200, {}, fixture('users/me.json')
+        ]}
+      end
+    end
+
+    it "should get a list of parsed recent messages" do
+      messages = @room.recent({:limit => 1})
+
+      messages.size.should equal(2)
+      messages.first.size.should equal(8)
+      messages.first[:user].size.should equal(7)
+    end
+  end
 end
