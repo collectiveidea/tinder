@@ -219,8 +219,11 @@ module Tinder
     # Accepts a hash for options:
     # * +:limit+: Restrict the number of messages returned
     # * +:since_message_id+: Get messages created after the specified message id
-    def recent(options={})
-      connection.get(room_url_for(:recent), options)['messages'].map do |msg|
+    def recent(limit=10, since_message_id=nil)
+      # Build url manually, faraday has to be 8.0 to do this
+      url = "#{room_url_for(:recent)}?limit=#{limit}&since_message_id=#{since_message_id}"
+
+      connection.get(url)['messages'].map do |msg|
         msg[:created_at] = Time.parse(msg[:created_at])
         msg[:user] = user(msg[:user_id])
         msg
