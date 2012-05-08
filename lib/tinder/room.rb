@@ -215,7 +215,12 @@ module Tinder
     #
     def search(term)
       encoded_term = URI.encode(term)
-      connection.get("/search/#{encoded_term}.json")["messages"].map do |room|
+
+      room_messages = connection.get("/search/#{encoded_term}.json")["messages"].select do |message|
+        message[:room_id] == id
+      end
+
+      room_messages.map do |room|
         { :id => room['id'],
           :user_id => room['user_id'],
           :message => room['body'],
