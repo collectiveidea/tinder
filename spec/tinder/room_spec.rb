@@ -62,6 +62,18 @@ describe Tinder::Room do
     end
   end
 
+  describe "search" do
+    before do
+      stub_connection(@connection) do |stub|
+        stub.get('/search/foo.json') {[200, {}, fixture("rooms/recent.json")]}
+      end
+    end
+
+    it "should GET the search endpoint with the search term" do
+      @room.search("foo")
+    end
+  end
+
   describe "unlock" do
     before do
       stub_connection(@connection) do |stub|
