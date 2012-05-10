@@ -204,6 +204,30 @@ module Tinder
       end
     end
 
+    # Search transcripts for a specific term
+    #
+    #   room.search("bobloblaw")
+    #   #=> [{:message=>"foo!",
+    #         :user_id=>"99999",
+    #         :person=>"Brandon",
+    #         :id=>"18659245",
+    #         :timestamp=>=>Tue May 05 07:15:00 -0700 2009}]
+    #
+    def search(term)
+      encoded_term = URI.encode(term)
+
+      room_messages = connection.get("/search/#{encoded_term}.json")["messages"].select do |message|
+        message[:room_id] == id
+      end
+
+      room_messages.map do |room|
+        { :id => room['id'],
+          :user_id => room['user_id'],
+          :message => room['body'],
+          :timestamp => Time.parse(room['created_at']) }
+      end
+    end
+
     def upload(file, content_type = nil, filename = nil)
       require 'mime/types'
       content_type ||= MIME::Types.type_for(filename || file)
