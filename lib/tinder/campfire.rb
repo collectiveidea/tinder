@@ -37,7 +37,9 @@ module Tinder
     end
 
     # Find a campfire room by id
+    # NOTE: id should be of type Integer
     def find_room_by_id(id)
+      id = id.to_i
       rooms.detect { |room| room.id == id }
     end
 
