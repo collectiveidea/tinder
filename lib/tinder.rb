@@ -1,5 +1,4 @@
 # encoding: UTF-8
-require 'active_support/all'
 require 'tinder/connection'
 require 'tinder/campfire'
 require 'tinder/room'

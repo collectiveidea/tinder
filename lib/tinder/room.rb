@@ -133,10 +133,11 @@ module Tinder
       Tinder.logger.info "Joining #{@name}…"
       join # you have to be in the room to listen
 
-      require 'active_support/json'
+      require 'json'
       require 'hashie'
       require 'multi_json'
       require 'twitter/json_stream'
+      require 'time'
 
       auth = connection.basic_auth_settings
       options = {

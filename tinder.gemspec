@@ -3,7 +3,6 @@ $:.push File.expand_path('../lib', __FILE__)
 require 'tinder/version'
 
 Gem::Specification.new do |gem|
-  gem.add_dependency 'activesupport', ['>= 2.3', '< 4']
   gem.add_dependency 'eventmachine', ['>= 0.12.0', '< 2']
   gem.add_dependency 'faraday', '~> 0.8'
   gem.add_dependency 'faraday_middleware', '~> 0.8'
