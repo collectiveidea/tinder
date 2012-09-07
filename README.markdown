@@ -24,7 +24,7 @@ See the RDoc for more details.
 
 ## Continuous Integration
 
-[![Build Status](https://secure.travis-ci.org/collectiveidea/tinder.png)](http://travis-ci.org/collectiveidea/tinder)
+[![Build Status](https://secure.travis-ci.org/collectiveidea/tinder.png)](http://travis-ci.org/collectiveidea/tinder) [![Dependency Status](https://gemnasium.com/collectiveidea/tinder.png)](https://gemnasium.com/collectiveidea/tinder)
 
 ## How to contribute
 
