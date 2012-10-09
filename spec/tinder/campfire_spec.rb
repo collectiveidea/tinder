@@ -25,7 +25,7 @@ describe Tinder::Campfire do
     end
   end
 
-  describe "find_by_id" do
+  describe "find_room_by_id" do
     before do
       stub_connection(@campfire.connection) do |stub|
         stub.get('/rooms.json') {[200, {}, fixture('rooms.json')]}
