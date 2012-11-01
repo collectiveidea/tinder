@@ -1,4 +1,6 @@
 # encoding: UTF-8
+require 'time'
+
 module Tinder
   # A campfire room
   class Room
@@ -109,8 +111,10 @@ module Tinder
       end
     end
 
-    # Listen for new messages in the room, yielding them to the provided block as they arrive.
-    # Each message is a hash with:
+    # Modifies a hash representation of a Campfire message.  Expands +:user_id+
+    # to a full hash at +:user+, generates Timestamp from +:created_at+.
+    #
+    # Full returned hash:
     # * +:body+: the body of the message
     # * +:user+: Campfire user, which is itself a hash, of:
     #   * +:id+: User id
@@ -123,6 +127,14 @@ module Tinder
     # * +:type+: Campfire message type
     # * +:room_id+: Campfire room id
     # * +:created_at+: Message creation timestamp
+    def parse_message(message)
+      message[:user] = user(message.delete(:user_id))
+      message[:created_at] = Time.parse(message[:created_at])
+      message
+    end
+
+    # Listen for new messages in the room, parsing them with #parse_message
+    # and then yielding them to the provided block as they arrive.
     #
     #   room.listen do |m|
     #     room.speak "Go away!" if m[:body] =~ /Java/i
@@ -137,7 +149,6 @@ module Tinder
       require 'hashie'
       require 'multi_json'
       require 'twitter/json_stream'
-      require 'time'
 
       auth = connection.basic_auth_settings
       options = {
@@ -154,8 +165,7 @@ module Tinder
         Tinder.logger.info "Listening to #{@name}…"
         @stream.each_item do |message|
           message = Hashie::Mash.new(MultiJson.decode(message))
-          message[:user] = user(message.delete(:user_id))
-          message[:created_at] = Time.parse(message[:created_at])
+          message = parse_message(message)
           yield(message)
         end
 
@@ -184,35 +194,18 @@ module Tinder
       @stream = nil
     end
 
-    # Get the transcript for the given date (Returns a hash in the same format as #listen)
-    #
-    #   room.transcript(room.available_transcripts.first)
-    #   #=> [{:message=>"foobar!",
-    #         :user_id=>"99999",
-    #         :person=>"Brandon",
-    #         :id=>"18659245",
-    #         :timestamp=>=>Tue May 05 07:15:00 -0700 2009}]
-    #
-    # The timestamp slot will typically have a granularity of five minutes.
+    # Get the transcript for the given date (returns an array of messages parsed
+    # via #parse_message, see #parse_message for format of returned message)
     #
     def transcript(transcript_date)
       url = "/room/#{@id}/transcript/#{transcript_date.to_date.strftime('%Y/%m/%d')}.json"
-      connection.get(url)['messages'].map do |room|
-        { :id => room['id'],
-          :user_id => room['user_id'],
-          :message => room['body'],
-          :timestamp => Time.parse(room['created_at']) }
+      connection.get(url)['messages'].map do |message|
+        parse_message(message)
       end
     end
 
-    # Search transcripts for a specific term
-    #
-    #   room.search("bobloblaw")
-    #   #=> [{:message=>"foo!",
-    #         :user_id=>"99999",
-    #         :person=>"Brandon",
-    #         :id=>"18659245",
-    #         :timestamp=>=>Tue May 05 07:15:00 -0700 2009}]
+    # Search transcripts for the given term (returns an array of messages parsed
+    # via #parse_message, see #parse_message for format of returned message)
     #
     def search(term)
       encoded_term = URI.encode(term)
@@ -221,11 +214,8 @@ module Tinder
         message[:room_id] == id
       end
 
-      room_messages.map do |room|
-        { :id => room['id'],
-          :user_id => room['user_id'],
-          :message => room['body'],
-          :timestamp => Time.parse(room['created_at']) }
+      room_messages.map do |message|
+        parse_message(message)
       end
     end
 
@@ -250,9 +240,7 @@ module Tinder
       url = "#{room_url_for(:recent)}?limit=#{options[:limit]}&since_message_id=#{options[:since_message_id]}"
 
       connection.get(url)['messages'].map do |msg|
-        msg[:created_at] = Time.parse(msg[:created_at])
-        msg[:user] = user(msg[:user_id])
-        msg
+        parse_message(msg)
       end
     end
 

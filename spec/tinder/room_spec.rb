@@ -69,8 +69,25 @@ describe Tinder::Room do
       end
     end
 
-    it "should GET the search endpoint with the search term" do
+    it "should GET the search endpoint with the search term and filter by room" do
+      @room.stub(:id).and_return(490096)
+      @room.should_receive(:parse_message).exactly(2).times
       @room.search("foo")
+    end
+
+    it "should return empty array if no messages in room" do
+      @room.should_receive(:parse_message).never
+      @room.search("foo").should be_empty
+    end
+  end
+
+  describe "transcript" do
+    it "should GET the transcript endpoint with the provided date" do
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749/transcript/2012/10/15.json') {[200, {}, fixture("rooms/recent.json")]}
+      end
+      @room.should_receive(:parse_message).exactly(2).times
+      @room.transcript(Date.parse('2012-10-15'))
     end
   end
 
@@ -210,21 +227,33 @@ describe Tinder::Room do
         stub.get('/room/80749/recent.json') {[
           200, {}, fixture('rooms/recent.json')
         ]}
-        stub.get('/users/1158839.json') {[
-          200, {}, fixture('users/me.json')
-        ]}
-        stub.get('/users/1158837.json') {[
-          200, {}, fixture('users/me.json')
-        ]}
       end
     end
 
     it "should get a list of parsed recent messages" do
-      messages = @room.recent({:limit => 1})
+      @room.should_receive(:parse_message).exactly(2).times
+      messages = @room.recent
+    end
+  end
 
-      messages.size.should equal(2)
-      messages.first.size.should equal(8)
-      messages.first[:user].size.should equal(7)
+  describe "parse_message" do
+    it "expands user and parses created_at" do
+      unparsed_message = {
+        :user_id => 123,
+        :body => 'An aunt is worth two nieces',
+        :created_at => '2012/02/14 16:21:00 +0000'
+      }
+      expected = {
+        :user => {
+          :name => 'Dr. Noodles'
+        },
+        :body => 'An aunt is worth two nieces',
+        :created_at => Time.parse('2012/02/14 16:21:00 +0000')
+      }
+      @room.stub(:user).with(123).and_return({ :name => 'Dr. Noodles' })
+
+      actual = @room.parse_message(unparsed_message)
+      actual.should == expected
     end
   end
 end
