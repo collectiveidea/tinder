@@ -197,7 +197,7 @@ module Tinder
     # Get the transcript for the given date (returns an array of messages parsed
     # via #parse_message, see #parse_message for format of returned message)
     #
-    def transcript(transcript_date)
+    def transcript(transcript_date = Date.today)
       url = "/room/#{@id}/transcript/#{transcript_date.to_date.strftime('%Y/%m/%d')}.json"
       connection.get(url)['messages'].map do |message|
         parse_message(message)

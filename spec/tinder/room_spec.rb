@@ -89,6 +89,15 @@ describe Tinder::Room do
       @room.should_receive(:parse_message).exactly(2).times
       @room.transcript(Date.parse('2012-10-15'))
     end
+
+    it "should default to today's date" do
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749/transcript/1981/03/21.json') {[200, {}, fixture("rooms/recent.json")]}
+      end
+      Date.stub(:today).and_return(Date.parse('1981-03-21'))
+      @room.should_receive(:parse_message).exactly(2).times
+      @room.transcript
+    end
   end
 
   describe "unlock" do
