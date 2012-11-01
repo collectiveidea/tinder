@@ -265,4 +265,65 @@ describe Tinder::Room do
       actual.should == expected
     end
   end
+
+  describe "user" do
+    before do
+      @room.stub(:current_users).and_return([
+        { :id => 1, :name => 'The Amazing Crayon Executive'},
+        { :id => 2, :name => 'Lord Pants'},
+      ])
+      @not_current_user = { :id => 3, :name => 'Patriot Sally'}
+    end
+
+    it "looks up user if not already in room's cache" do
+      @room.should_receive(:fetch_user).with(3).
+        and_return(@not_current_user)
+      @room.user(3).should == @not_current_user
+    end
+
+    it "pulls user from room's cache if user in participant list" do
+      @room.should_receive(:fetch_user).never
+      user = @room.user(1)
+    end
+
+    it "adds user to cache after first lookup" do
+      @room.should_receive(:fetch_user).with(3).at_most(:once).
+        and_return(@not_current_user)
+      @room.user(3).should == @not_current_user
+      @room.user(3).should == @not_current_user
+    end
+  end
+
+  describe "fetch_user" do
+    before do
+      stub_connection(@connection) do |stub|
+        stub.get("/users/5.json") {[200, {}, fixture('users/me.json')]}
+      end
+    end
+
+    it "requests via GET and returns the requested user's information" do
+      @room.fetch_user(5)['name'].should == 'John Doe'
+    end
+  end
+
+  describe "current_users" do
+    it "returns list of currently participating users" do
+      current_users = @room.current_users
+      current_users.size.should == 1
+      current_users.first[:name].should == 'Brandon Keepers'
+    end
+  end
+
+  describe "users" do
+    it "returns current users if cache has not been initialized yet" do
+      @room.should_receive(:current_users).and_return(:the_whole_spittoon)
+      @room.users.should == :the_whole_spittoon
+    end
+
+    it "returns current users plus any added cached users" do
+      @room.should_receive(:current_users).and_return([:mia_cuttlefish])
+      @room.users << :guy_wearing_new_mexico_as_a_hat
+      @room.users.should == [:mia_cuttlefish, :guy_wearing_new_mexico_as_a_hat]
+    end
+  end
 end

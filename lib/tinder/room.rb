@@ -94,21 +94,31 @@ module Tinder
 
     # Get the list of users currently chatting for this room
     def users
-      reload!
-      @users
+      @users ||= current_users
     end
 
-    # return the user with the given id; if it isn't in our room cache, do a request to get it
+    def current_users
+      reload!
+      @current_users
+    end
+
+    # return the user with the given id; if it isn't in our room cache,
+    # do a request to get it
     def user(id)
       if id
-        user = users.detect {|u| u[:id] == id }
-        unless user
-          user_data = connection.get("/users/#{id}.json")
-          user = user_data && user_data[:user]
-        end
-        user[:created_at] = Time.parse(user[:created_at])
+        cached_user = users.detect {|u| u[:id] == id }
+        user = cached_user || fetch_user(id)
+        self.users << user
         user
       end
+    end
+
+    # Perform a request for the user with the given ID
+    def fetch_user(id)
+      user_data = connection.get("/users/#{id}.json")
+      user = user_data && user_data[:user]
+      user[:created_at] = Time.parse(user[:created_at])
+      user
     end
 
     # Modifies a hash representation of a Campfire message.  Expands +:user_id+
@@ -259,7 +269,10 @@ module Tinder
       @full = attributes['full']
       @open_to_guests = attributes['open_to_guests']
       @active_token_value = attributes['active_token_value']
-      @users = attributes['users']
+      @current_users = attributes['users'].map do |user|
+        user[:created_at] = Time.parse(user[:created_at])
+        user
+      end
 
       @loaded = true
     end
