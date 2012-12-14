@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'faraday', '~> 0.8'
   gem.add_dependency 'faraday_middleware', '~> 0.9'
   gem.add_dependency 'hashie', '~> 1.0'
-  gem.add_dependency 'oj', '~> 1.4.7'
+  gem.add_dependency 'json', '~> 1.7.5'
   gem.add_dependency 'mime-types', '~> 1.19'
   gem.add_dependency 'multi_json', '~> 1.5'
   gem.add_dependency 'twitter-stream', '~> 0.1'
