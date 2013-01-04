@@ -1,3 +1,6 @@
+1.9.2 - 2013-01-04
+* Update dependencies to latest versions
+
 1.9.0 - 2012-07-16
 * Add Room#recent to get a list of recent messages
 * Add Room#search to search a room's transcripts
