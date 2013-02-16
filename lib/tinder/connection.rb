@@ -40,9 +40,15 @@ module Tinder
       @options.merge!(options)
       @uri = URI.parse("#{@options[:ssl] ? 'https' : 'http' }://#{subdomain}.#{HOST}")
       @token = options[:token]
+      @oauth_token = options[:oauth_token]
 
-      connection.basic_auth token, 'X'
-      raw_connection.basic_auth token, 'X'
+      if @oauth_token
+        connection.headers["Authorization"] = "Bearer #{@oauth_token}"
+        raw_connection.headers["Authorization"] = "Bearer #{@oauth_token}"
+      else
+        connection.basic_auth token, 'X'
+        raw_connection.basic_auth token, 'X'
+      end
     end
 
     def basic_auth_settings
