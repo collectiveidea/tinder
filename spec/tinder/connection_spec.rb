@@ -37,6 +37,33 @@ describe Tinder::Connection do
       connection = Tinder::Connection.new('test', :token => 'mytoken')
       lambda { connection.get('/rooms.json') }.should_not raise_error
     end
+
+  end
+
+  describe "oauth" do
+    let (:oauth_token) { "myoauthtoken" }
+    let (:connection) { Tinder::Connection.new('test', :oauth_token => oauth_token) }
+
+    before do
+      stub_connection(Tinder::Connection) do |stub|
+        stub.get("/rooms.json") {[200, {}, fixture('rooms.json')]}
+      end
+    end
+
+    it "should authenticate" do
+      lambda { connection.get('/rooms.json') }.should_not raise_error
+    end
+
+    it "should set the oauth_token" do
+      connection.get('/rooms.json')
+      connection.options[:oauth_token].should == oauth_token
+    end
+
+    it "should set an Authorization header" do
+      connection.get('/rooms.json')
+      connection.connection.headers["Authorization"].should == "Bearer #{oauth_token}"
+    end
+
   end
 
   describe "ssl" do
