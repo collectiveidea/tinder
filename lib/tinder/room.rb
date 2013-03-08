@@ -186,7 +186,7 @@ module Tinder
 
     # Get the transcript for the given date (Returns a hash in the same format as #listen)
     #
-    #   room.transcript(room.available_transcripts.first)
+    #   room.transcript(Time.now)
     #   #=> [{:message=>"foobar!",
     #         :user_id=>"99999",
     #         :person=>"Brandon",
@@ -196,12 +196,9 @@ module Tinder
     # The timestamp slot will typically have a granularity of five minutes.
     #
     def transcript(transcript_date)
-      url = "/room/#{@id}/transcript/#{transcript_date.to_date.strftime('%Y/%m/%d')}.json"
+      url = "/room/#{@id}/transcript/#{transcript_date.strftime('%Y/%m/%d')}.json"
       connection.get(url)['messages'].map do |room|
-        { :id => room['id'],
-          :user_id => room['user_id'],
-          :message => room['body'],
-          :timestamp => Time.parse(room['created_at']) }
+        map_room_attributes(room)
       end
     end
 
@@ -222,10 +219,7 @@ module Tinder
       end
 
       room_messages.map do |room|
-        { :id => room['id'],
-          :user_id => room['user_id'],
-          :message => room['body'],
-          :timestamp => Time.parse(room['created_at']) }
+        map_room_attributes(room)
       end
     end
 
@@ -297,6 +291,14 @@ module Tinder
 
     def connection
       @connection
+    end
+
+    def map_room_attributes(room)
+      { :id => room['id'],
+        :user_id => room['user_id'],
+        :message => room['body'],
+        :type => room['type'],
+        :timestamp => Time.parse(room['created_at']) }
     end
   end
 end
