@@ -204,6 +204,29 @@ describe Tinder::Room do
     end
   end
 
+  describe "transcript" do
+    before do
+      stub_connection(@connection) do |stub|
+        stub.get("/room/80749/transcript/#{Time.now.strftime('%Y/%m/%d')}.json") {[
+          200, {}, fixture('rooms/recent.json')
+        ]}
+      end
+    end
+
+    it "should return an array of messages" do
+      @room.transcript(Time.now).should be_a(Array)
+    end
+
+    it "should have messages with attributes" do
+      message = @room.transcript(Time.now).first
+
+      message[:id].should be_a(Integer)
+      message[:user_id].should be_a(Integer)
+      message[:message].should be_a(String)
+      message[:timestamp].should be_a(Time)
+    end
+  end
+
   describe "recent" do
     before do
       stub_connection(@connection) do |stub|
