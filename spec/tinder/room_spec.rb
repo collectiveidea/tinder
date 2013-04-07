@@ -1,5 +1,6 @@
 # encoding: UTF-8
 require 'spec_helper'
+require 'date'
 
 describe Tinder::Room do
   before do
