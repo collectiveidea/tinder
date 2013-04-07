@@ -1,5 +1,6 @@
 # encoding: UTF-8
 require 'spec_helper'
+require 'date'
 
 describe Tinder::Room do
   before do
@@ -69,8 +70,34 @@ describe Tinder::Room do
       end
     end
 
-    it "should GET the search endpoint with the search term" do
+    it "should GET the search endpoint with the search term and filter by room" do
+      @room.stub(:id).and_return(490096)
+      @room.should_receive(:parse_message).exactly(2).times
       @room.search("foo")
+    end
+
+    it "should return empty array if no messages in room" do
+      @room.should_receive(:parse_message).never
+      @room.search("foo").should be_empty
+    end
+  end
+
+  describe "transcript" do
+    it "should GET the transcript endpoint with the provided date" do
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749/transcript/2012/10/15.json') {[200, {}, fixture("rooms/recent.json")]}
+      end
+      @room.should_receive(:parse_message).exactly(2).times
+      @room.transcript(Date.parse('2012-10-15'))
+    end
+
+    it "should default to today's date" do
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749/transcript/1981/03/21.json') {[200, {}, fixture("rooms/recent.json")]}
+      end
+      Date.stub(:today).and_return(Date.parse('1981-03-21'))
+      @room.should_receive(:parse_message).exactly(2).times
+      @room.transcript
     end
   end
 
@@ -210,21 +237,94 @@ describe Tinder::Room do
         stub.get('/room/80749/recent.json') {[
           200, {}, fixture('rooms/recent.json')
         ]}
-        stub.get('/users/1158839.json') {[
-          200, {}, fixture('users/me.json')
-        ]}
-        stub.get('/users/1158837.json') {[
-          200, {}, fixture('users/me.json')
-        ]}
       end
     end
 
     it "should get a list of parsed recent messages" do
-      messages = @room.recent({:limit => 1})
+      @room.should_receive(:parse_message).exactly(2).times
+      messages = @room.recent
+    end
+  end
 
-      messages.size.should equal(2)
-      messages.first.size.should equal(8)
-      messages.first[:user].size.should equal(7)
+  describe "parse_message" do
+    it "expands user and parses created_at" do
+      unparsed_message = {
+        :user_id => 123,
+        :body => 'An aunt is worth two nieces',
+        :created_at => '2012/02/14 16:21:00 +0000'
+      }
+      expected = {
+        :user => {
+          :name => 'Dr. Noodles'
+        },
+        :body => 'An aunt is worth two nieces',
+        :created_at => Time.parse('2012/02/14 16:21:00 +0000')
+      }
+      @room.stub(:user).with(123).and_return({ :name => 'Dr. Noodles' })
+
+      actual = @room.parse_message(unparsed_message)
+      actual.should == expected
+    end
+  end
+
+  describe "user" do
+    before do
+      @room.stub(:current_users).and_return([
+        { :id => 1, :name => 'The Amazing Crayon Executive'},
+        { :id => 2, :name => 'Lord Pants'},
+      ])
+      @not_current_user = { :id => 3, :name => 'Patriot Sally'}
+    end
+
+    it "looks up user if not already in room's cache" do
+      @room.should_receive(:fetch_user).with(3).
+        and_return(@not_current_user)
+      @room.user(3).should == @not_current_user
+    end
+
+    it "pulls user from room's cache if user in participant list" do
+      @room.should_receive(:fetch_user).never
+      user = @room.user(1)
+    end
+
+    it "adds user to cache after first lookup" do
+      @room.should_receive(:fetch_user).with(3).at_most(:once).
+        and_return(@not_current_user)
+      @room.user(3).should == @not_current_user
+      @room.user(3).should == @not_current_user
+    end
+  end
+
+  describe "fetch_user" do
+    before do
+      stub_connection(@connection) do |stub|
+        stub.get("/users/5.json") {[200, {}, fixture('users/me.json')]}
+      end
+    end
+
+    it "requests via GET and returns the requested user's information" do
+      @room.fetch_user(5)['name'].should == 'John Doe'
+    end
+  end
+
+  describe "current_users" do
+    it "returns list of currently participating users" do
+      current_users = @room.current_users
+      current_users.size.should == 1
+      current_users.first[:name].should == 'Brandon Keepers'
+    end
+  end
+
+  describe "users" do
+    it "returns current users if cache has not been initialized yet" do
+      @room.should_receive(:current_users).and_return(:the_whole_spittoon)
+      @room.users.should == :the_whole_spittoon
+    end
+
+    it "returns current users plus any added cached users" do
+      @room.should_receive(:current_users).and_return([:mia_cuttlefish])
+      @room.users << :guy_wearing_new_mexico_as_a_hat
+      @room.users.should == [:mia_cuttlefish, :guy_wearing_new_mexico_as_a_hat]
     end
   end
 end
