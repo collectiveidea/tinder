@@ -25,6 +25,7 @@ module Tinder
 
     def self.raw_connection
       @raw_connection ||= Faraday.new do |builder|
+        builder.use     Faraday::Request::Multipart
         builder.use     FaradayMiddleware::Mashify
         builder.use     FaradayMiddleware::ParseJson
         builder.use     Faraday::Response::RemoveWhitespace
