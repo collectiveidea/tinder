@@ -1,4 +1,6 @@
 # encoding: UTF-8
+require 'time'
+
 module Tinder
   # A campfire room
   class Room
@@ -92,25 +94,37 @@ module Tinder
 
     # Get the list of users currently chatting for this room
     def users
-      reload!
-      @users
+      @users ||= current_users
     end
 
-    # return the user with the given id; if it isn't in our room cache, do a request to get it
+    def current_users
+      reload!
+      @current_users
+    end
+
+    # return the user with the given id; if it isn't in our room cache,
+    # do a request to get it
     def user(id)
       if id
-        user = users.detect {|u| u[:id] == id }
-        unless user
-          user_data = connection.get("/users/#{id}.json")
-          user = user_data && user_data[:user]
-        end
-        user[:created_at] = Time.parse(user[:created_at])
+        cached_user = users.detect {|u| u[:id] == id }
+        user = cached_user || fetch_user(id)
+        self.users << user
         user
       end
     end
 
-    # Listen for new messages in the room, yielding them to the provided block as they arrive.
-    # Each message is a hash with:
+    # Perform a request for the user with the given ID
+    def fetch_user(id)
+      user_data = connection.get("/users/#{id}.json")
+      user = user_data && user_data[:user]
+      user[:created_at] = Time.parse(user[:created_at])
+      user
+    end
+
+    # Modifies a hash representation of a Campfire message.  Expands +:user_id+
+    # to a full hash at +:user+, generates Timestamp from +:created_at+.
+    #
+    # Full returned hash:
     # * +:body+: the body of the message
     # * +:user+: Campfire user, which is itself a hash, of:
     #   * +:id+: User id
@@ -123,6 +137,14 @@ module Tinder
     # * +:type+: Campfire message type
     # * +:room_id+: Campfire room id
     # * +:created_at+: Message creation timestamp
+    def parse_message(message)
+      message[:user] = user(message.delete(:user_id))
+      message[:created_at] = Time.parse(message[:created_at])
+      message
+    end
+
+    # Listen for new messages in the room, parsing them with #parse_message
+    # and then yielding them to the provided block as they arrive.
     #
     #   room.listen do |m|
     #     room.speak "Go away!" if m[:body] =~ /Java/i
@@ -137,7 +159,6 @@ module Tinder
       require 'hashie'
       require 'multi_json'
       require 'twitter/json_stream'
-      require 'time'
 
       auth = connection.basic_auth_settings
       options = {
@@ -154,8 +175,7 @@ module Tinder
         Tinder.logger.info "Listening to #{@name}…"
         @stream.each_item do |message|
           message = Hashie::Mash.new(MultiJson.decode(message))
-          message[:user] = user(message.delete(:user_id))
-          message[:created_at] = Time.parse(message[:created_at])
+          message = parse_message(message)
           yield(message)
         end
 
@@ -184,35 +204,21 @@ module Tinder
       @stream = nil
     end
 
-    # Get the transcript for the given date (Returns a hash in the same format as #listen)
+    # Get the transcript for the given date (returns an array of messages parsed
+    # via #parse_message, see #parse_message for format of returned message)
     #
-    #   room.transcript(room.available_transcripts.first)
-    #   #=> [{:message=>"foobar!",
-    #         :user_id=>"99999",
-    #         :person=>"Brandon",
-    #         :id=>"18659245",
-    #         :timestamp=>=>Tue May 05 07:15:00 -0700 2009}]
-    #
-    # The timestamp slot will typically have a granularity of five minutes.
-    #
-    def transcript(transcript_date)
-      url = "/room/#{@id}/transcript/#{transcript_date.to_date.strftime('%Y/%m/%d')}.json"
-      connection.get(url)['messages'].map do |room|
-        { :id => room['id'],
-          :user_id => room['user_id'],
-          :message => room['body'],
-          :timestamp => Time.parse(room['created_at']) }
+    def transcript(transcript_date = Date.today)
+      unless transcript_date.is_a?(Date)
+        transcript_date = transcript_date.to_date
+      end
+      url = "/room/#{@id}/transcript/#{transcript_date.strftime('%Y/%m/%d')}.json"
+      connection.get(url)['messages'].map do |message|
+        parse_message(message)
       end
     end
 
-    # Search transcripts for a specific term
-    #
-    #   room.search("bobloblaw")
-    #   #=> [{:message=>"foo!",
-    #         :user_id=>"99999",
-    #         :person=>"Brandon",
-    #         :id=>"18659245",
-    #         :timestamp=>=>Tue May 05 07:15:00 -0700 2009}]
+    # Search transcripts for the given term (returns an array of messages parsed
+    # via #parse_message, see #parse_message for format of returned message)
     #
     def search(term)
       encoded_term = URI.encode(term)
@@ -221,11 +227,8 @@ module Tinder
         message[:room_id] == id
       end
 
-      room_messages.map do |room|
-        { :id => room['id'],
-          :user_id => room['user_id'],
-          :message => room['body'],
-          :timestamp => Time.parse(room['created_at']) }
+      room_messages.map do |message|
+        parse_message(message)
       end
     end
 
@@ -244,14 +247,13 @@ module Tinder
     # Accepts a hash for options:
     # * +:limit+: Restrict the number of messages returned
     # * +:since_message_id+: Get messages created after the specified message id
-    def recent(limit=10, since_message_id=nil)
+    def recent(options = {})
+      options = { :limit => 10, :since_message_id => nil }.merge(options)
       # Build url manually, faraday has to be 8.0 to do this
-      url = "#{room_url_for(:recent)}?limit=#{limit}&since_message_id=#{since_message_id}"
+      url = "#{room_url_for(:recent)}?limit=#{options[:limit]}&since_message_id=#{options[:since_message_id]}"
 
       connection.get(url)['messages'].map do |msg|
-        msg[:created_at] = Time.parse(msg[:created_at])
-        msg[:user] = user(msg[:user_id])
-        msg
+        parse_message(msg)
       end
     end
 
@@ -270,7 +272,10 @@ module Tinder
       @full = attributes['full']
       @open_to_guests = attributes['open_to_guests']
       @active_token_value = attributes['active_token_value']
-      @users = attributes['users']
+      @current_users = attributes['users'].map do |user|
+        user[:created_at] = Time.parse(user[:created_at])
+        user
+      end
 
       @loaded = true
     end
