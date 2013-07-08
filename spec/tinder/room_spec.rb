@@ -15,11 +15,11 @@ describe Tinder::Room do
     # Get EventMachine out of the way. We could be using em-spec, but seems like overkill
     require 'twitter/json_stream'
     module EventMachine; def self.run; yield end end
-    EventMachine.stub!(:reactor_running?).and_return(true)
-    @stream = mock(Twitter::JSONStream)
-    @stream.stub!(:each_item)
-    @stream.stub!(:on_error)
-    @stream.stub!(:on_max_reconnects)
+    EventMachine.stub(:reactor_running?).and_return(true)
+    @stream = double(Twitter::JSONStream)
+    @stream.stub(:each_item)
+    @stream.stub(:on_error)
+    @stream.stub(:on_max_reconnects)
   end
 
   describe "join" do
@@ -115,12 +115,12 @@ describe Tinder::Room do
 
   describe "guest_url" do
     it "should use guest_invite_code if active" do
-      @room.stub!(:guest_access_enabled? => true, :guest_invite_code => '123')
+      @room.stub(:guest_access_enabled? => true, :guest_invite_code => '123')
       @room.guest_url.should == "https://test.campfirenow.com/123"
     end
 
     it "should return nil when guest access is not enabled" do
-      @room.stub!(:guest_access_enabled?).and_return(false)
+      @room.stub(:guest_access_enabled?).and_return(false)
       @room.guest_url.should be_nil
     end
   end
@@ -194,7 +194,7 @@ describe Tinder::Room do
     end
 
     it "marks the room as listening" do
-      Twitter::JSONStream.stub!(:connect).and_return(@stream)
+      Twitter::JSONStream.stub(:connect).and_return(@stream)
       lambda {
         @room.listen { }
       }.should change(@room, :listening?).from(false).to(true)
@@ -207,8 +207,8 @@ describe Tinder::Room do
         stub.post('/room/80749/join.json') {[200, {}, ""]}
       end
 
-      Twitter::JSONStream.stub!(:connect).and_return(@stream)
-      @stream.stub!(:stop)
+      Twitter::JSONStream.stub(:connect).and_return(@stream)
+      @stream.stub(:stop)
     end
 
     it "changes a listening room to a non-listening room" do
