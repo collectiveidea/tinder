@@ -82,7 +82,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass', :ssl_verify => false)
-      connection.connection.ssl[:verify].should be == false
+      connection.connection.verify?.should be == false
     end
 
     it "should allow passing any ssl_options to Faraday" do
@@ -98,7 +98,7 @@ describe Tinder::Connection do
           :ca_file => "/etc/ssl/custom"
         }
       )
-      connection.connection.ssl.should eql(:verify => false, :ca_path => "/usr/lib/ssl/certs", :ca_file => "/etc/ssl/custom")
+      connection.connection.ssl.to_hash.should eql(:verify => false, :ca_path => "/usr/lib/ssl/certs", :ca_file => "/etc/ssl/custom")
     end
   end
 end

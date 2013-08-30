@@ -4,7 +4,7 @@ require 'tinder/version'
 
 Gem::Specification.new do |gem|
   gem.add_dependency 'eventmachine', '~> 1.0'
-  gem.add_dependency 'faraday', '~> 0.8'
+  gem.add_dependency 'faraday', '~> 0.9.0.rc5'
   gem.add_dependency 'faraday_middleware', '~> 0.9'
   gem.add_dependency 'hashie', ['>= 1.0', '< 3']
   gem.add_dependency 'json', '~> 1.8.0'

@@ -1,10 +1,15 @@
 # encoding: UTF-8
 require 'faraday'
 require 'faraday/response/raise_on_authentication_failure'
+require 'faraday/request/multipart'
 require 'faraday/response/remove_whitespace'
 require 'faraday_middleware'
 require 'json'
 require 'uri'
+
+class Faraday::RequestOptions
+  attr_accessor :preserve_raw
+end
 
 module Tinder
   class Connection
