@@ -16,9 +16,9 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
 
-  gem.authors = ["Brandon Keepers", "Brian Ryckbost"]
+  gem.authors = ["Brandon Keepers", "Brian Ryckbost", "Tony Coconate"]
   gem.description = %q{A Ruby API for interfacing with Campfire, the 37Signals chat application.}
-  gem.email = ['brandon@opensoul.org', 'bryckbost@gmail.com']
+  gem.email = ['brandon@opensoul.org', 'bryckbost@gmail.com', 'me@tonycoconate.com']
   gem.extra_rdoc_files = ['README.markdown']
   gem.files = `git ls-files`.split("\n")
   gem.homepage = 'http://github.com/collectiveidea/tinder'
