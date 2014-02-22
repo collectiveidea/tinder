@@ -25,6 +25,25 @@ describe Tinder::Campfire do
     end
   end
 
+  describe "presence" do
+    before do
+      stub_connection(@campfire.connection) do |stub|
+        stub.get('/presence.json') {[200, {}, fixture('presence.json')]}
+      end
+    end
+
+    it "should return rooms" do
+      @campfire.presence.size.should be == 3
+      @campfire.presence.first.should be_kind_of(Tinder::Room)
+    end
+
+    it "should set the room name and id" do
+      room = @campfire.presence.last
+      room.name.should be == 'Room 3'
+      room.id.should be == 80754
+    end
+  end
+
   describe "find_room_by_id" do
     before do
       stub_connection(@campfire.connection) do |stub|

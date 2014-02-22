@@ -36,6 +36,13 @@ module Tinder
       end
     end
 
+    # Get an array of all rooms user is present in
+    def presence
+      connection.get('/presence.json')['rooms'].map do |room|
+        Room.new(connection, room)
+      end
+    end
+
     # Find a campfire room by id
     # NOTE: id should be of type Integer
     def find_room_by_id(id)
