@@ -1,3 +1,10 @@
+1.9.4 - 2014-02-24
+* Fix typos in MIT licence
+* Add Campfire#presence to get a list of rooms in which you are present
+
+1.9.3 - 2013-09-06
+* OAuth support
+
 1.9.2 - 2013-01-04
 * Update dependencies to latest versions
 
