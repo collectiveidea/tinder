@@ -215,10 +215,10 @@ module Tinder
     #
     # The timestamp slot will typically have a granularity of five minutes.
     #
-    def transcript(transcript_date)
+    def transcript(transcript_date = Date.today)
       url = "/room/#{@id}/transcript/#{transcript_date.strftime('%Y/%m/%d')}.json"
-      connection.get(url)['messages'].map do |room|
-        map_room_attributes(room)
+      connection.get(url)['messages'].map do |message|
+        parse_message(message)
       end
     end
 
@@ -232,8 +232,8 @@ module Tinder
         message[:room_id] == id
       end
 
-      room_messages.map do |room|
-        map_room_attributes(room)
+      room_messages.map do |message|
+        parse_message(message)
       end
     end
 
@@ -309,12 +309,5 @@ module Tinder
       @connection
     end
 
-    def map_room_attributes(room)
-      { :id => room['id'],
-        :user_id => room['user_id'],
-        :message => room['body'],
-        :type => room['type'],
-        :timestamp => Time.parse(room['created_at']) }
-    end
   end
 end

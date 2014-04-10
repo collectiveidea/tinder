@@ -99,6 +99,31 @@ describe Tinder::Room do
       @room.should_receive(:parse_message).exactly(2).times
       @room.transcript
     end
+
+    it "should return an array of messages" do
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749/transcript/2012/10/15.json') {[200, {}, fixture('rooms/recent.json')]}
+        stub.get('/users/1158839.json') {[200, {}, fixture('users/me.json')]}
+        stub.get('/users/1158837.json') {[200, {}, fixture('users/me.json')]}
+      end
+
+      @room.transcript(Date.parse('2012-10-15')).should be_a(Array)
+    end
+
+    it "should have messages with attributes" do
+      stub_connection(@connection) do |stub|
+        stub.get('/room/80749/transcript/2012/10/15.json') {[200, {}, fixture("rooms/recent.json")]}
+        stub.get('/users/1158839.json') {[200, {}, fixture('users/me.json')]}
+        stub.get('/users/1158837.json') {[200, {}, fixture('users/me.json')]}
+      end
+
+      message = @room.transcript(Date.parse('2012-10-15')).first
+
+      message[:id].should be_a(Integer)
+      message[:user][:id].should be_a(Integer)
+      message[:body].should be_a(String)
+      message[:created_at].should be_a(Time)
+    end
   end
 
   describe "unlock" do
@@ -228,29 +253,6 @@ describe Tinder::Room do
       @room.listen { }
       @room.stop_listening
       @room.stop_listening
-    end
-  end
-
-  describe "transcript" do
-    before do
-      stub_connection(@connection) do |stub|
-        stub.get("/room/80749/transcript/#{Time.now.strftime('%Y/%m/%d')}.json") {[
-          200, {}, fixture('rooms/recent.json')
-        ]}
-      end
-    end
-
-    it "should return an array of messages" do
-      @room.transcript(Time.now).should be_a(Array)
-    end
-
-    it "should have messages with attributes" do
-      message = @room.transcript(Time.now).first
-
-      message[:id].should be_a(Integer)
-      message[:user_id].should be_a(Integer)
-      message[:message].should be_a(String)
-      message[:timestamp].should be_a(Time)
     end
   end
 
