@@ -1,5 +1,10 @@
 # Tinder - get the Campfire started
 
+[![Gem Version](https://badge.fury.io/rb/tinder.png)](http://badge.fury.io/rb/tinder)
+[![Build Status](https://travis-ci.org/collectiveidea/tinder.png?branch=master)](https://travis-ci.org/collectiveidea/tinder)
+[![Code Climate](https://codeclimate.com/github/collectiveidea/tinder.png)](https://codeclimate.com/github/collectiveidea/tinder)
+[![Dependency Status](https://gemnasium.com/collectiveidea/tinder.png)](https://gemnasium.com/collectiveidea/tinder)
+
 Tinder is a library for interfacing with Campfire, the chat application from 37Signals, allowing you to programmatically manage and speak/listen in chat rooms.  As of December 2009, thanks to initial work from Joshua Peek at 37signals, it now makes use of the official Campfire API (described at: http://developer.37signals.com/campfire/).
 
 ## Usage
@@ -24,22 +29,19 @@ See the RDoc for more details.
 
     gem install tinder
 
-## Continuous Integration
+## Contributions
 
-[![Build Status](https://secure.travis-ci.org/collectiveidea/tinder.png)](http://travis-ci.org/collectiveidea/tinder) [![Dependency Status](https://gemnasium.com/collectiveidea/tinder.png)](https://gemnasium.com/collectiveidea/tinder)
+Tinder is open source and contributions from the community are encouraged! No contribution is too small. Please consider:
 
-## How to contribute
+* adding an awesome feature
+* fixing a terrible bug
+* updating documentation
+* fixing a not-so-bad bug
+* fixing typos
 
-If you find what looks like a bug:
+For the best chance of having your changes merged, please:
 
-1. Check the GitHub issue tracker to see if anyone else has had the same issue.
-   http://github.com/collectiveidea/tinder/issues/
-2. If you don't see anything, create an issue with information on how to reproduce it.
-
-If you want to contribute an enhancement or a fix:
-
-1. Fork the project on github.
-   http://github.com/collectiveidea/tinder
-2. Make your changes with tests.
-3. Commit the changes without making changes to the Rakefile, VERSION, or any other files that aren't related to your enhancement or fix
-4. Send a pull request.
+1. Ask us! We'd love to hear what you're up to.
+2. Fork the project.
+3. Commit your changes and tests (if applicable (they're applicable)).
+4. Submit a pull request with a thorough explanation and at least one animated GIF.
