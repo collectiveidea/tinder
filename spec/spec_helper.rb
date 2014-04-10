@@ -5,8 +5,6 @@ require 'rspec'
 require 'tinder'
 require 'fakeweb'
 
-require 'faraday/adapter/test'
-
 FakeWeb.allow_net_connect = false
 
 def fixture(name)
