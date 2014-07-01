@@ -73,7 +73,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass')
-      connection.ssl?.should be_true
+      connection.should be_ssl
     end
 
     it "should should allow peer verification to be turned off" do
