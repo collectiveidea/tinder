@@ -4,11 +4,11 @@ require 'tinder/version'
 
 Gem::Specification.new do |gem|
   gem.add_dependency 'eventmachine', '~> 1.0'
-  gem.add_dependency 'faraday', '~> 0.9.0.rc7'
+  gem.add_dependency 'faraday', '~> 0.9.0'
   gem.add_dependency 'faraday_middleware', '~> 0.9'
   gem.add_dependency 'hashie', ['>= 1.0', '< 3']
   gem.add_dependency 'json', '~> 1.8.0'
-  gem.add_dependency 'mime-types', '~> 2.2'
+  gem.add_dependency 'mime-types'
   gem.add_dependency 'multi_json', '~> 1.7'
   gem.add_dependency 'twitter-stream', '~> 0.1'
 

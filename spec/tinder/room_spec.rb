@@ -155,7 +155,7 @@ describe Tinder::Room do
   end
 
   it "should set guest_access_enabled?" do
-    @room.guest_access_enabled?.should be_true
+    @room.should be_guest_access_enabled
   end
 
   describe "topic" do
