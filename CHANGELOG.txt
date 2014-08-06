@@ -1,3 +1,7 @@
+1.10.0 - 2014-08-06
+* Update Faraday dependency
+* Loosen mime-type dependency
+
 1.9.4 - 2014-02-24
 * Fix typos in MIT licence
 * Add Campfire#presence to get a list of rooms in which you are present
