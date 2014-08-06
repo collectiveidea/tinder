@@ -3,6 +3,13 @@ require 'spec_helper'
 require 'date'
 
 describe Tinder::Room do
+
+  def mock_listen_callbacks(stream)
+    expect(stream).to receive(:each_item).with(any_args).and_return(true)
+    expect(stream).to receive(:on_error)
+    expect(stream).to receive(:on_max_reconnects)
+  end
+
   before do
     @connection = Tinder::Connection.new('test', :token => 'mytoken')
 
@@ -15,11 +22,9 @@ describe Tinder::Room do
     # Get EventMachine out of the way. We could be using em-spec, but seems like overkill
     require 'twitter/json_stream'
     module EventMachine; def self.run; yield end end
-    EventMachine.stub(:reactor_running?).and_return(true)
+    expect(EventMachine).to receive(:reactor_running?).at_most(:once).and_return(true)
+
     @stream = double(Twitter::JSONStream)
-    @stream.stub(:each_item)
-    @stream.stub(:on_error)
-    @stream.stub(:on_max_reconnects)
   end
 
   describe "join" do
@@ -46,7 +51,7 @@ describe Tinder::Room do
     end
 
     it "stops listening" do
-      @room.should_receive(:stop_listening)
+      expect(@room).to receive(:stop_listening)
       @room.leave
     end
   end
@@ -71,14 +76,14 @@ describe Tinder::Room do
     end
 
     it "should GET the search endpoint with the search term and filter by room" do
-      @room.stub(:id).and_return(490096)
-      @room.should_receive(:parse_message).exactly(2).times
+      expect(@room).to receive(:id).twice.and_return(490096)
+      expect(@room).to receive(:parse_message).exactly(2).times
       @room.search("foo")
     end
 
     it "should return empty array if no messages in room" do
-      @room.should_receive(:parse_message).never
-      @room.search("foo").should be_empty
+      expect(@room).not_to receive(:parse_message)
+      expect(@room.search("foo")).to be_empty
     end
   end
 
@@ -87,7 +92,7 @@ describe Tinder::Room do
       stub_connection(@connection) do |stub|
         stub.get('/room/80749/transcript/2012/10/15.json') {[200, {}, fixture("rooms/recent.json")]}
       end
-      @room.should_receive(:parse_message).exactly(2).times
+      expect(@room).to receive(:parse_message).exactly(2).times
       @room.transcript(Date.parse('2012-10-15'))
     end
 
@@ -95,8 +100,8 @@ describe Tinder::Room do
       stub_connection(@connection) do |stub|
         stub.get('/room/80749/transcript/1981/03/21.json') {[200, {}, fixture("rooms/recent.json")]}
       end
-      Date.stub(:today).and_return(Date.parse('1981-03-21'))
-      @room.should_receive(:parse_message).exactly(2).times
+      expect(Date).to receive(:today).and_return(Date.parse('1981-03-21'))
+      expect(@room).to receive(:parse_message).exactly(2).times
       @room.transcript
     end
 
@@ -107,7 +112,7 @@ describe Tinder::Room do
         stub.get('/users/1158837.json') {[200, {}, fixture('users/me.json')]}
       end
 
-      @room.transcript(Date.parse('2012-10-15')).should be_a(Array)
+      expect(@room.transcript(Date.parse('2012-10-15'))).to be_a(Array)
     end
 
     it "should have messages with attributes" do
@@ -119,10 +124,10 @@ describe Tinder::Room do
 
       message = @room.transcript(Date.parse('2012-10-15')).first
 
-      message[:id].should be_a(Integer)
-      message[:user][:id].should be_a(Integer)
-      message[:body].should be_a(String)
-      message[:created_at].should be_a(Time)
+      expect(message[:id]).to be_a(Integer)
+      expect(message[:user][:id]).to be_a(Integer)
+      expect(message[:body]).to be_a(String)
+      expect(message[:created_at]).to be_a(Time)
     end
   end
 
@@ -140,31 +145,32 @@ describe Tinder::Room do
 
   describe "guest_url" do
     it "should use guest_invite_code if active" do
-      @room.stub(:guest_access_enabled? => true, :guest_invite_code => '123')
-      @room.guest_url.should == "https://test.campfirenow.com/123"
+      expect(@room).to receive(:guest_access_enabled?).and_return(true)
+      expect(@room).to receive(:guest_invite_code).and_return('123')
+      expect(@room.guest_url).to eq("https://test.campfirenow.com/123")
     end
 
     it "should return nil when guest access is not enabled" do
-      @room.stub(:guest_access_enabled?).and_return(false)
-      @room.guest_url.should be_nil
+      expect(@room).to receive(:guest_access_enabled?).and_return(false)
+      expect(@room.guest_url).to be_nil
     end
   end
 
   it "should set guest_invite_code" do
-    @room.guest_invite_code.should == "90cf7"
+    expect(@room.guest_invite_code).to eq("90cf7")
   end
 
   it "should set guest_access_enabled?" do
-    @room.guest_access_enabled?.should be_true
+    expect(@room.guest_access_enabled?).to eq(true)
   end
 
   describe "topic" do
     it "should get the current topic" do
-      @room.topic.should == "Testing"
+      expect(@room.topic).to eq("Testing")
     end
 
     it "should get the current topic even if it's changed" do
-      @room.topic.should == "Testing"
+      expect(@room.topic).to eq("Testing")
 
       # reinitialize a new connection since we can't modify the
       # faraday stack after a request has already been submitted
@@ -175,7 +181,7 @@ describe Tinder::Room do
         stub.get('/room/80749.json') {[200, {}, fixture('rooms/room80751.json')]}
       end
 
-      @room.topic.should == "Testing 2"
+      expect(@room.topic).to eq("Testing 2")
 
     end
   end
@@ -199,7 +205,7 @@ describe Tinder::Room do
     end
 
     it "should get from the streaming url" do
-      Twitter::JSONStream.should_receive(:connect).with(
+      expect(Twitter::JSONStream).to receive(:connect).with(
         {
           :host=>"streaming.campfirenow.com",
           :path=>"/room/80749/live.json",
@@ -208,21 +214,22 @@ describe Tinder::Room do
           :ssl=>true
         }
       ).and_return(@stream)
-
+      mock_listen_callbacks(@stream)
       @room.listen { }
     end
 
     it "should raise an exception if no block is given" do
-      lambda {
+      expect {
         @room.listen
-      }.should raise_error(ArgumentError, "no block provided")
+      }.to raise_error(ArgumentError, "no block provided")
     end
 
     it "marks the room as listening" do
-      Twitter::JSONStream.stub(:connect).and_return(@stream)
-      lambda {
+      expect(Twitter::JSONStream).to receive(:connect).and_return(@stream)
+      mock_listen_callbacks(@stream)
+      expect {
         @room.listen { }
-      }.should change(@room, :listening?).from(false).to(true)
+      }.to change(@room, :listening?).from(false).to(true)
     end
   end
 
@@ -232,24 +239,26 @@ describe Tinder::Room do
         stub.post('/room/80749/join.json') {[200, {}, ""]}
       end
 
-      Twitter::JSONStream.stub(:connect).and_return(@stream)
-      @stream.stub(:stop)
+      expect(Twitter::JSONStream).to receive(:connect).and_return(@stream)
+      expect(@stream).to receive(:stop)
     end
 
     it "changes a listening room to a non-listening room" do
+      mock_listen_callbacks(@stream)
       @room.listen { }
-      lambda {
+      expect {
         @room.stop_listening
-      }.should change(@room, :listening?).from(true).to(false)
+      }.to change(@room, :listening?).from(true).to(false)
     end
 
     it "tells the json stream to stop" do
+      mock_listen_callbacks(@stream)
       @room.listen { }
-      @stream.should_receive(:stop)
       @room.stop_listening
     end
 
     it "does nothing if the room is not listening" do
+      mock_listen_callbacks(@stream)
       @room.listen { }
       @room.stop_listening
       @room.stop_listening
@@ -266,7 +275,7 @@ describe Tinder::Room do
     end
 
     it "should get a list of parsed recent messages" do
-      @room.should_receive(:parse_message).exactly(2).times
+      expect(@room).to receive(:parse_message).exactly(2).times
       messages = @room.recent
     end
   end
@@ -285,16 +294,16 @@ describe Tinder::Room do
         :body => 'An aunt is worth two nieces',
         :created_at => Time.parse('2012/02/14 16:21:00 +0000')
       }
-      @room.stub(:user).with(123).and_return({ :name => 'Dr. Noodles' })
+      expect(@room).to receive(:user).with(123).and_return({ :name => 'Dr. Noodles' })
 
       actual = @room.parse_message(unparsed_message)
-      actual.should == expected
+      expect(actual).to eq(expected)
     end
   end
 
   describe "user" do
     before do
-      @room.stub(:current_users).and_return([
+      expect(@room).to receive(:current_users).and_return([
         { :id => 1, :name => 'The Amazing Crayon Executive'},
         { :id => 2, :name => 'Lord Pants'},
       ])
@@ -302,21 +311,21 @@ describe Tinder::Room do
     end
 
     it "looks up user if not already in room's cache" do
-      @room.should_receive(:fetch_user).with(3).
+      expect(@room).to receive(:fetch_user).with(3).
         and_return(@not_current_user)
-      @room.user(3).should == @not_current_user
+      expect(@room.user(3)).to eq(@not_current_user)
     end
 
     it "pulls user from room's cache if user in participant list" do
-      @room.should_receive(:fetch_user).never
+      expect(@room).not_to receive(:fetch_user)
       user = @room.user(1)
     end
 
     it "adds user to cache after first lookup" do
-      @room.should_receive(:fetch_user).with(3).at_most(:once).
+      expect(@room).to receive(:fetch_user).with(3).at_most(:once).
         and_return(@not_current_user)
-      @room.user(3).should == @not_current_user
-      @room.user(3).should == @not_current_user
+      expect(@room.user(3)).to eq(@not_current_user)
+      expect(@room.user(3)).to eq(@not_current_user)
     end
   end
 
@@ -328,28 +337,28 @@ describe Tinder::Room do
     end
 
     it "requests via GET and returns the requested user's information" do
-      @room.fetch_user(5)['name'].should == 'John Doe'
+      expect(@room.fetch_user(5)['name']).to eq('John Doe')
     end
   end
 
   describe "current_users" do
     it "returns list of currently participating users" do
       current_users = @room.current_users
-      current_users.size.should == 1
-      current_users.first[:name].should == 'Brandon Keepers'
+      expect(current_users.size).to eq(1)
+      expect(current_users.first[:name]).to eq('Brandon Keepers')
     end
   end
 
   describe "users" do
     it "returns current users if cache has not been initialized yet" do
-      @room.should_receive(:current_users).and_return(:the_whole_spittoon)
-      @room.users.should == :the_whole_spittoon
+      expect(@room).to receive(:current_users).and_return(:the_whole_spittoon)
+      expect(@room.users).to eq(:the_whole_spittoon)
     end
 
     it "returns current users plus any added cached users" do
-      @room.should_receive(:current_users).and_return([:mia_cuttlefish])
+      expect(@room).to receive(:current_users).and_return([:mia_cuttlefish])
       @room.users << :guy_wearing_new_mexico_as_a_hat
-      @room.users.should == [:mia_cuttlefish, :guy_wearing_new_mexico_as_a_hat]
+      expect(@room.users).to eq([:mia_cuttlefish, :guy_wearing_new_mexico_as_a_hat])
     end
   end
 end
