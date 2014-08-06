@@ -14,14 +14,14 @@ describe Tinder::Campfire do
     end
 
     it "should return rooms" do
-      @campfire.rooms.size.should be == 2
-      @campfire.rooms.first.should be_kind_of(Tinder::Room)
+      expect(@campfire.rooms.size).to eq(2)
+      expect(@campfire.rooms.first).to be_kind_of(Tinder::Room)
     end
 
     it "should set the room name and id" do
       room = @campfire.rooms.first
-      room.name.should be == 'Room 1'
-      room.id.should be == 80749
+      expect(room.name).to eq('Room 1')
+      expect(room.id).to eq(80749)
     end
   end
 
@@ -33,14 +33,14 @@ describe Tinder::Campfire do
     end
 
     it "should return rooms" do
-      @campfire.presence.size.should be == 3
-      @campfire.presence.first.should be_kind_of(Tinder::Room)
+      expect(@campfire.presence.size).to eq(3)
+      expect(@campfire.presence.first).to be_kind_of(Tinder::Room)
     end
 
     it "should set the room name and id" do
       room = @campfire.presence.last
-      room.name.should be == 'Room 3'
-      room.id.should be == 80754
+      expect(room.name).to eq('Room 3')
+      expect(room.id).to eq(80754)
     end
   end
 
@@ -53,12 +53,12 @@ describe Tinder::Campfire do
 
     it "should return a Tinder::Room object when a match is found" do
       room = @campfire.find_room_by_id 80749
-      room.should be_kind_of(Tinder::Room)
+      expect(room).to be_kind_of(Tinder::Room)
     end
 
     it "should return nil when no match is found" do
       room = @campfire.find_room_by_id 123
-      room.should be nil
+      expect(room).to eq(nil)
     end
   end
 
@@ -71,12 +71,12 @@ describe Tinder::Campfire do
 
     it "should return a Tinder::Room object when a match is found" do
       room = @campfire.find_room_by_name 'Room 1'
-      room.should be_kind_of(Tinder::Room)
+      expect(room).to be_kind_of(Tinder::Room)
     end
 
     it "should return nil when no match is found" do
       room = @campfire.find_room_by_name 'asdf'
-      room.should be nil
+      expect(room).to eq(nil)
     end
   end
 
@@ -92,9 +92,9 @@ describe Tinder::Campfire do
     end
 
     it "should return a sorted list of users in all rooms" do
-      @campfire.users.length.should be == 2
-      @campfire.users.first[:name].should be == "Jane Doe"
-      @campfire.users.last[:name].should be == "John Doe"
+      expect(@campfire.users.length).to eq(2)
+      expect(@campfire.users.first[:name]).to eq("Jane Doe")
+      expect(@campfire.users.last[:name]).to eq("John Doe")
     end
   end
 
@@ -106,7 +106,7 @@ describe Tinder::Campfire do
     end
 
     it "should return the current user's information" do
-      @campfire.me["name"].should be == "John Doe"
+      expect(@campfire.me["name"]).to eq("John Doe")
     end
   end
 end

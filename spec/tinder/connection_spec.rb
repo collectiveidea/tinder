@@ -9,7 +9,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :token => 'foo')
-      lambda { connection.get('/rooms.json') }.should raise_error(Tinder::AuthenticationFailed)
+      expect { connection.get('/rooms.json') }.to raise_error(Tinder::AuthenticationFailed)
     end
 
     it "should raise an exception when an invalid subdomain is specified" do
@@ -18,7 +18,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :token => 'foo')
-      lambda { connection.get('/rooms.json') }.should raise_error(Tinder::AuthenticationFailed)
+      expect { connection.get('/rooms.json') }.to raise_error(Tinder::AuthenticationFailed)
     end
 
     it "should lookup token when username/password provided" do
@@ -27,7 +27,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass')
-      connection.token.should == "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      expect(connection.token).to eq("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     end
 
     it "should use basic auth for credentials" do
@@ -35,7 +35,7 @@ describe Tinder::Connection do
         stub.get("/rooms.json") {[200, {}, fixture('rooms.json')]}
       end
       connection = Tinder::Connection.new('test', :token => 'mytoken')
-      lambda { connection.get('/rooms.json') }.should_not raise_error
+      expect { connection.get('/rooms.json') }.not_to raise_error
     end
 
   end
@@ -51,17 +51,17 @@ describe Tinder::Connection do
     end
 
     it "should authenticate" do
-      lambda { connection.get('/rooms.json') }.should_not raise_error
+      expect { connection.get('/rooms.json') }.to_not raise_error
     end
 
     it "should set the oauth_token" do
       connection.get('/rooms.json')
-      connection.options[:oauth_token].should == oauth_token
+      expect(connection.options[:oauth_token]).to eq(oauth_token)
     end
 
     it "should set an Authorization header" do
       connection.get('/rooms.json')
-      connection.connection.headers["Authorization"].should == "Bearer #{oauth_token}"
+      expect(connection.connection.headers["Authorization"]).to eq("Bearer #{oauth_token}")
     end
 
   end
@@ -73,7 +73,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass')
-      connection.ssl?.should be_true
+      expect(connection.ssl?).to eq(true)
     end
 
     it "should should allow peer verification to be turned off" do
@@ -82,7 +82,7 @@ describe Tinder::Connection do
       end
 
       connection = Tinder::Connection.new('test', :username => 'user', :password => 'pass', :ssl_verify => false)
-      connection.connection.ssl.verify?.should be == false
+      expect(connection.connection.ssl.verify?).to eq(false)
     end
 
     it "should allow passing any ssl_options to Faraday" do
@@ -98,7 +98,7 @@ describe Tinder::Connection do
           :ca_file => "/etc/ssl/custom"
         }
       )
-      connection.connection.ssl.to_hash.should eql(:verify => false, :ca_path => "/usr/lib/ssl/certs", :ca_file => "/etc/ssl/custom")
+      expect(connection.connection.ssl.to_hash).to eq(:verify => false, :ca_path => "/usr/lib/ssl/certs", :ca_file => "/etc/ssl/custom")
     end
   end
 end
