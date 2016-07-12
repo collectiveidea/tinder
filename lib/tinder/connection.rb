@@ -95,7 +95,7 @@ module Tinder
     end
 
     def raw_post(url, body = nil, *args)
-      response = raw_connection.post(url, body, *args)
+      raw_connection.post(url, body, *args)
     end
 
     def put(url, body = nil, *args)
