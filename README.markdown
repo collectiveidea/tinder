@@ -3,7 +3,6 @@
 [![Gem Version](https://badge.fury.io/rb/tinder.png)](http://badge.fury.io/rb/tinder)
 [![Build Status](https://travis-ci.org/collectiveidea/tinder.png?branch=master)](https://travis-ci.org/collectiveidea/tinder)
 [![Code Climate](https://codeclimate.com/github/collectiveidea/tinder.png)](https://codeclimate.com/github/collectiveidea/tinder)
-[![Dependency Status](https://gemnasium.com/collectiveidea/tinder.png)](https://gemnasium.com/collectiveidea/tinder)
 
 Tinder is a library for interfacing with Campfire, the chat application from 37Signals, allowing you to programmatically manage and speak/listen in chat rooms.  As of December 2009, thanks to initial work from Joshua Peek at 37signals, it now makes use of the official Campfire API (described at: http://developer.37signals.com/campfire/).
 
