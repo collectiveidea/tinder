@@ -3,13 +3,13 @@ $:.push File.expand_path('../lib', __FILE__)
 require 'tinder/version'
 
 Gem::Specification.new do |gem|
-  gem.add_dependency 'eventmachine', '~> 1.0'
-  gem.add_dependency 'faraday', '~> 0.9.0'
-  gem.add_dependency 'faraday_middleware', '~> 0.9'
-  gem.add_dependency 'hashie', ['>= 1.0']
-  gem.add_dependency 'json', '~> 1.8.0'
+  gem.add_dependency 'eventmachine', '>= 1.2'
+  gem.add_dependency 'faraday', '>= 0.9'
+  gem.add_dependency 'faraday_middleware', '>= 0.9'
+  gem.add_dependency 'hashie', '>= 1.0'
+  gem.add_dependency 'json', '>= 1.8'
   gem.add_dependency 'mime-types'
-  gem.add_dependency 'multi_json', '~> 1.7'
+  gem.add_dependency 'multi_json', '~> 1.12'
   gem.add_dependency 'twitter-stream', '~> 0.1'
 
   gem.add_development_dependency 'fakeweb'
