@@ -111,7 +111,7 @@ module Tinder
   private
     def set_connection_options(conn)
       conn.url_prefix = @uri.to_s
-      conn.proxy options[:proxy]
+      conn.proxy = options[:proxy]
       if options[:ssl_options]
         conn.ssl.merge!(options[:ssl_options])
       end
